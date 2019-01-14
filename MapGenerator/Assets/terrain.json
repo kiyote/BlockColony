@@ -1,0 +1,167 @@
+﻿{
+  "terrain": [
+    {
+      "id": 1,
+      "idname": "water",
+      "phase": "water"
+    },
+    {
+      "id": 2,
+      "idname": "air",
+      "phase": "air"
+    },
+    {
+      "id": 3,
+      "idname": "soil",
+      "phase": "soil"
+    },
+    {
+      "id": 4,
+      "idname": "sandstone",
+      "phase": "sandstone"
+    },
+    {
+      "id": 5,
+      "idname": "igneous",
+      "phase": "igneous"
+    },
+    {
+      "id": 6,
+      "idname": "granite",
+      "phase": "granite"
+    },
+    {
+      "id": 7,
+      "idname": "magma",
+      "phase": "magma"
+    }
+  ],
+  "phase": [
+    {
+      "name": "water",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Ice",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 120
+        },
+        {
+          "transition": 99,
+          "name": "Water",
+          "phase": "Liquid",
+          "pathable": true,
+          "pathingcost": 1000
+        },
+        {
+          "transition": 999,
+          "name": "Steam",
+          "phase": "Gas",
+          "pathable": true,
+          "pathingcost": 100
+        }
+      ]
+    },
+    {
+      "name": "magma",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Igneous",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 80
+        },
+        {
+          "transition": 1200,
+          "name": "Magma",
+          "phase": "Liquid",
+          "pathable": true,
+          "pathingcost": 2000
+        }
+      ]
+    },
+    {
+      "name": "air",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Air",
+          "phase": "Gas",
+          "pathable": true,
+          "pathingcost": 100
+        }
+      ]
+    },
+    {
+      "name": "soil",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Dirt",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 100
+        }
+      ]
+    },
+    {
+      "name": "granite",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Granite",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 80
+        },
+        {
+          "transition": 1200,
+          "name": "lava",
+          "phase": "Liquid",
+          "pathable": true,
+          "pathingcost": 2000
+        }
+      ]
+    },
+    {
+      "name": "igneous",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Igneous",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 80
+        },
+        {
+          "transition": 1200,
+          "name": "lava",
+          "phase": "Liquid",
+          "pathable": true,
+          "pathingcost": 2000
+        }
+      ]
+    },
+    {
+      "name": "sandstone",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Sandstone",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 80
+        },
+        {
+          "transition": 1200,
+          "name": "lava",
+          "phase": "Liquid",
+          "pathable": true,
+          "pathingcost": 2000
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+﻿{
+  "phase": [
+    {
+      "name": "test_phase",
+      "phases": [
+        {
+          "transition": 0,
+          "name": "Phase_Name",
+          "phase": "Solid",
+          "pathable": false,
+          "pathingcost": 1
+        }
+      ]
+    }
+  ],
+  "terrain": [
+    {
+      "id": 1,
+      "idname": "test_name",
+      "phase": "test_phase"
+    }
+  ]
+}

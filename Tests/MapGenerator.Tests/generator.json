@@ -1,0 +1,23 @@
+﻿{
+  "columns": 100,
+  "rows": 100,
+  "ambientTemperature": 21,
+  "terrain": {
+    "outside": {
+      "idname": "soil"
+    },
+    "entry": {
+      "idname": "sandstone"
+    },
+    "middle": {
+      "idname": "igneous"
+    },
+    "far": {
+      "idname": "granite"
+    },
+    "river": {
+      "easy": "water",
+      "hard": "magma"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+﻿{
+  "columns": 400,
+  "rows": 400,
+  "ambientTemperature": 21,
+  "terrain": {
+    "outside": "soil",
+    "entry": "sandstone",
+    "middle": "igneous",
+    "far": "granite",
+    "river": {
+      "easy": "water",
+      "hard": "magma"
+    }
+  }
+}

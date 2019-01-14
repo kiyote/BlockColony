@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mob\Mob.csproj" />
+    <ProjectReference Include="..\Pathfinding\Pathfinding.csproj" />
+    <ProjectReference Include="..\Surface\Surface.csproj" />
+    <ProjectReference Include="..\Work\Work.csproj" />
+  </ItemGroup>
+
+</Project>
