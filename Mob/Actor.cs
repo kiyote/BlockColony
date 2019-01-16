@@ -1,68 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using Pathfinding;
 using Surface;
-using Work;
 
-namespace Mob
-{
-    public class Actor: IJobFit
-    {
-		private Job _currentJob;
-		private bool _movePending;
-		private int _moveColumn;
-		private int _moveRow;
-		private List<int> _path;
+namespace Mob {
+	public class Actor : IPathfindingCallback {
+		private Route _path;
+		private Route _pendingPath;
 
 		public Actor(
+			int column,
+			int row,
+			Locomotion locomotion
 		) {
+			Column = column;
+			Row = row;
+			Locomotion = locomotion;
 		}
 
-		public Task FindJob(CancellationToken token) {
-			return Task.CompletedTask;
+		public int Column { get; }
+
+		public int Row { get; }
+
+		public Locomotion Locomotion { get; }
+
+		// This will be called from the UI thread
+		public void UiUpdate() {
 		}
 
-		// For polling by Unity thread
-		public bool IsMovePending {
-			get {
-				return _movePending;
+		// This will be called from the Simulation thread
+		public void SimulationUpdate() {
+			if( _path == default( Route ) ) {
+				Route localPendingPath = default( Route );
+
+				localPendingPath = Interlocked.Exchange( ref _pendingPath, default( Route ) );
+				_path = localPendingPath;
 			}
 		}
 
-		public int Column { get; set; }
+		// This will be called from the Pathfinding thread
+		void IPathfindingCallback.PathFound( Route path ) {
 
-		public int Row { get; set; }
+			var oldPendingPath = Interlocked.Exchange( ref _pendingPath, path );
 
-		// Called by the unity thread to pick up the current movement step
-		// needed
-		public Location GetPendingMove() {
-			// Copy the movement locally
-			Location result;
-			result.Column = _moveColumn;
-			result.Row = _moveRow;
-
-			// Reset the movement
-			_moveColumn = 0;
-			_moveRow = 0;
-			_movePending = false;
-
-			// It may now happen that a non-unity thread has set the
-			// pending movement already
-
-			// Return the movment
-			return result;
-		}
-
-		// For Unity thread to call when animation is done
-		public void MovementComplete() {
-			//TODO: Check to see if there are any steps remaining
-			// If so, set the _moveColumn & _moveRow, then set
-			// _movePending to true
-		}
-
-		public async Task<int> GetFitnessAsync( Job job ) {
-			return 100;
+			if ( oldPendingPath != default(Route)) {
+				// We updated the pending pathing before it was ever seen
+				// by the UI thread.
+			}
 		}
 	}
 }

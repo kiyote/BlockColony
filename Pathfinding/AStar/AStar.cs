@@ -6,7 +6,7 @@ using Pathfinding.FastPriorityQueue;
 namespace Pathfinding.AStar {
 	internal class AStar : IMapNeighbourMethod {
 
-		private static readonly List<int> Empty = new List<int>();
+		private static readonly Route Empty = new Route();
 		private Map _map;
 		private readonly Dictionary<int, int> _costSoFar;
 		private readonly Dictionary<int, int> _cameFrom;
@@ -43,12 +43,12 @@ namespace Pathfinding.AStar {
 			return dc + dr;
 		}
 
-		public List<int> GetPath( Map map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
+		public Route GetPath( Map map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
 			return GetPath( map, ref map.GetCell( startColumn, startRow ), ref map.GetCell( goalColumn, goalRow ), locomotion );
 		}
 
 			// Conduct the A* search
-		public List<int> GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
+		public Route GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			_locomotion = locomotion;
 			_map = map;
 			var startNode = new AStarPriorityQueueNode {
@@ -78,7 +78,7 @@ namespace Pathfinding.AStar {
 			}
 
 
-			var path = new List<int>();
+			var path = new Route();
 			int step = goal.Index;
 
 			while( step != start.Index ) {

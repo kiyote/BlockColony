@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Pathfinding\Pathfinding.csproj" />
     <ProjectReference Include="..\Surface\Surface.csproj" />
-    <ProjectReference Include="..\Work\Work.csproj" />
   </ItemGroup>
 
 </Project>

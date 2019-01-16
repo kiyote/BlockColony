@@ -23,13 +23,12 @@ namespace Simulation
 		private ActorManager _actorManager;
 		private CancellationTokenSource _tokenSource;
 		private CancellationToken _token;
-		private readonly IPathfinder _pathfinder;
 		private readonly Map _map;
+		private long _uiElapsedMilliseconds;
 
 		public SimulationManager(
 			JobManager jobManager,
 			ActorManager actorManager,
-			IPathfinder pathfinder,
 			Map map
 		) {
 			_thread = new Thread( Run );
@@ -39,7 +38,6 @@ namespace Simulation
 			_jobManager = jobManager;
 			_addedActors = new ConcurrentQueue<Actor>();
 			_actorManager = actorManager;
-			_pathfinder = pathfinder;
 			_map = map;
 
 			_tokenSource = new CancellationTokenSource();
@@ -76,6 +74,11 @@ namespace Simulation
 			_gate.Set();
 		}
 
+		public void UiUpdate(long elapsedMilliseconds) {
+			Interlocked.Add( ref _uiElapsedMilliseconds, elapsedMilliseconds );
+			_gate.Set();
+		}
+
 		private void Run() {
 			_isRunning = true;
 			Started?.Invoke(this, EventArgs.Empty);
@@ -89,8 +92,12 @@ namespace Simulation
 					_actorManager.Add( actor );
 				}
 
-				_jobManager.Update();
-				_actorManager.Update(_token).Wait(_token);
+				long elapsedMilliseconds = Interlocked.Exchange( ref _uiElapsedMilliseconds, 0 );
+
+				if (elapsedMilliseconds > 0) {
+					_jobManager.SimulationUpdate();
+					_actorManager.SimulationUpdate();
+				}
 
 				_gate.WaitOne();
 			}
@@ -98,11 +105,8 @@ namespace Simulation
 			Stopped?.Invoke(this, EventArgs.Empty);
 		}
 
-		internal async void AssignJobs(
-			ActorManager actorManager,
-			JobManager jobManager,
-			IPathfinder pathfinder
-		) {
+		internal void AssignJobs() {
+			/*
 			for (int priority = Job.Critical; priority < Job.PriorityCount; priority++ ) {
 				var idle = actorManager.GetIdleActors();
 				if ( !idle.Any() ) {
@@ -111,7 +115,7 @@ namespace Simulation
 
 				var jobs = jobManager.GetOpenJobs( priority );
 				var tasks = jobs.SelectMany( job => idle.Select( async actor => {
-					var fitness = await actor.GetFitnessAsync( job ).ConfigureAwait(false);
+					var fitness = GetFitness( job, actor );
 					var step = job.Activity.First().Step.First();
 					var path = await pathfinder.GetPathAsync( _map, actor.Column, actor.Row, step.Column, step.Row, Locomotion.Walk ).ConfigureAwait(false);
 					fitness -= path.Count;
@@ -126,6 +130,7 @@ namespace Simulation
 					Console.WriteLine( first.Actor.ToString() );
 				}
 			}
+			*/
 		}
     }
 }

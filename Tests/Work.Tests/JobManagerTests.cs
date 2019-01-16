@@ -1,33 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using NUnit.Framework;
-using Mob;
-using Work;
 using Pathfinding;
 using Surface;
 using Work.Actions;
 
-namespace Simulation.Tests {
+namespace Work.Tests {
 	[TestFixture]
-	public class SimulationManagerTests {
+	public class JobManagerTests {
 
-		private JobManager _jobManager;
-		private ActorManager _actorManager;
-		private SimulationManager _manager;
 		private PathfindingManager _pathfindingManager;
-		private IPathfinder _pathfinder;
+		private JobManager _manager;
 		private Map _map;
 
-		[OneTimeSetUp]
-		public void OneTimeSetUp() {
+		[SetUp]
+		public void SetUp() {
 			_map = new Map( 10, 10, new DefaultInitializer() );
-
 			_pathfindingManager = new PathfindingManager();
-			_actorManager = new ActorManager(_pathfindingManager);
-			_jobManager = new JobManager(_pathfindingManager);
-			_manager = new SimulationManager(
-				_jobManager,
-				_actorManager,
-				_map );
+			_manager = new JobManager( _pathfindingManager );
+		}
+
+		[TearDown]
+		public void TearDown() {
+
 		}
 
 		[Test]
@@ -35,13 +31,15 @@ namespace Simulation.Tests {
 			var job = new Job( Job.Medium, new Activity[] {
 				new DigTileAction( ref _map.GetCell( 5, 5 ) )
 				} );
-			_jobManager.Add( job );
+			_manager.Add( job );
 
+			/*
 			_actorManager.Add( new Actor(
 				column: 1,
 				row: 1,
 				locomotion: Locomotion.Walk
 			) );
+			*/
 
 			//_manager.AssignJobs( _actorManager, _jobManager, _pathfinder );
 		}

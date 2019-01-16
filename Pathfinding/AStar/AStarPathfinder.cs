@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Surface;
 
 namespace Pathfinding.AStar {
+	// This provides an implementation pool so that if we're running the 
+	// pathfinding async then there is always an implementation available
+	// to be used exclusively by that task run.  If we're running synchronously
+	// then the pool implementation is pointless.
 	public class AStarPathfinder : IPathfinder {
 
 		private readonly ConcurrentBag<AStar> _pool;
@@ -13,7 +16,7 @@ namespace Pathfinding.AStar {
 			_pool = new ConcurrentBag<AStar>();
 		}
 
-		List<int> IPathfinder.GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
+		Route IPathfinder.GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			if (!_pool.TryTake(out AStar impl)) {
 				impl = new AStar( map.Columns * map.Rows );
 			}
@@ -25,7 +28,7 @@ namespace Pathfinding.AStar {
 			return path;
 		}
 
-		Task<List<int>> IPathfinder.GetPathAsync( Map map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
+		Task<Route> IPathfinder.GetPathAsync( Map map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
 
 			if( !_pool.TryTake( out AStar impl ) ) {
 				impl = new AStar( map.Columns * map.Rows );

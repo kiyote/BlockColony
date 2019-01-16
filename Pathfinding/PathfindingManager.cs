@@ -13,7 +13,11 @@ namespace Pathfinding {
 		private IPathfinder _pathfinder;
 		private bool _isRunning;
 
-		private class PathRequest {
+		public interface IPathingToken {
+			void Cancel();
+		}
+
+		private class PathRequest: IPathingToken {
 			public Map Map;
 			public int StartColumn;
 			public int StartRow;
@@ -21,20 +25,32 @@ namespace Pathfinding {
 			public int GoalRow;
 			public Locomotion Locomotion;
 			public IPathfindingCallback Callback;
+			public bool Cancelled;
+
+			void IPathingToken.Cancel() {
+				Cancelled = true;
+			}
 		}
 
-		public PathfindingManager() {
+		public PathfindingManager()
+			:this( new AStarPathfinder()) 
+		{
+		}
+
+		public PathfindingManager(
+			IPathfinder pathfinder
+		) {
 			_gate = new AutoResetEvent( false );
-			_pathfinder = new AStarPathfinder();
+			_pathfinder = pathfinder;
 			_thread = new Thread( Run ) {
-				Name = "Pathfinding"
+				Name = "Pathfinding Thread"
 			};
 			_isRunning = false;
 			_requests = new ConcurrentQueue<PathRequest>();
 		}
 
+		// These run on the Pathfinding thread, so use them at your own risk
 		public event EventHandler Started;
-
 		public event EventHandler Stopped;
 
 		public bool IsRunning {
@@ -43,7 +59,7 @@ namespace Pathfinding {
 			}
 		}
 
-		public void GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion, IPathfindingCallback callback ) {
+		public IPathingToken GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion, IPathfindingCallback callback ) {
 			if( !_isRunning ) {
 				throw new InvalidOperationException( "Attempt to path with stopped pathfinding manager." );
 			}
@@ -59,6 +75,8 @@ namespace Pathfinding {
 			};
 			_requests.Enqueue( request );
 			_gate.Set();
+
+			return request;
 		}
 
 		public void Start() {
@@ -85,12 +103,14 @@ namespace Pathfinding {
 						break;
 					}
 					if( _requests.TryDequeue( out PathRequest request ) ) {
-						var path = _pathfinder.GetPath(
-							request.Map,
-							ref request.Map.GetCell( request.StartColumn, request.StartRow ),
-							ref request.Map.GetCell( request.GoalColumn, request.GoalRow ),
-							request.Locomotion );
-						request.Callback.PathFound( path );
+						if (!request.Cancelled) {
+							var path = _pathfinder.GetPath(
+								request.Map,
+								ref request.Map.GetCell( request.StartColumn, request.StartRow ),
+								ref request.Map.GetCell( request.GoalColumn, request.GoalRow ),
+								request.Locomotion );
+							request.Callback.PathFound( path );
+						}
 					}
 
 				}

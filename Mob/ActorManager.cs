@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
+using Pathfinding;
+using Surface;
 
 namespace Mob {
 	public class ActorManager {
-		private List<Actor> _actors;
-		private List<Actor> _idle;
+		private readonly PathfindingManager _pathfindingManager;
+		private readonly List<Actor> _actors;
+		private readonly List<Actor> _idle;
 
-		public ActorManager() {
+		public ActorManager(
+			PathfindingManager pathfindingManager
+		) {
+			_pathfindingManager = pathfindingManager;
+
 			_actors = new List<Actor>();
 			_idle = new List<Actor>();
 		}
@@ -20,12 +24,29 @@ namespace Mob {
 			_idle.Add( actor );
 		}
 
-		public async Task Update(CancellationToken token) {
-			await Task.WhenAll( _idle.Select( async actor => await actor.FindJob(token).ConfigureAwait(false) ) ).ConfigureAwait(false);
-		}
-
 		public List<Actor> GetIdleActors() {
 			return _idle;
+		}
+
+		// Called from the UI thread
+		public void UiUpdate() {
+		}
+
+		// Called from the simulation thread
+		public void SimulationUpdate() {
+			foreach (var actor in _actors) {
+				actor.SimulationUpdate();
+			}
+		}
+
+		private void MoveActor(Map map, Actor actor, MapCell goal) {
+			MakeBusy( actor );
+			ref var source = ref map.GetCell( actor.Column, actor.Row );
+			_pathfindingManager.GetPath( map, ref source, ref goal, actor.Locomotion, actor );
+		}
+
+		private void MakeBusy(Actor actor) {
+			_idle.Remove( actor );			
 		}
 	}
 }

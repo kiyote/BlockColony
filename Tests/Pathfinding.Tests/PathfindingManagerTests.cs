@@ -153,7 +153,7 @@ namespace Pathfinding.Tests {
 		private class PathfindingCallback : IPathfindingCallback {
 
 			private readonly AutoResetEvent _event;
-			private List<int> _path;
+			private Route _path;
 
 			public PathfindingCallback( AutoResetEvent arEvent ) {
 				_event = arEvent;
@@ -162,13 +162,13 @@ namespace Pathfinding.Tests {
 
 			public int CallbackCount { get; set; }
 
-			public List<int> Path {
+			public Route Path {
 				get {
 					return _path;
 				}
 			}
 
-			public void PathFound( List<int> path ) {
+			public void PathFound( Route path ) {
 				Interlocked.Exchange( ref _path, path );
 				CallbackCount += 1;
 				_event.Set();
