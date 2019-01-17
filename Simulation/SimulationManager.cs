@@ -13,6 +13,7 @@ namespace Simulation
 {
     public class SimulationManager
     {
+		/*
 		private Thread _thread;
 		private AutoResetEvent _gate;
 		private bool _terminated;
@@ -106,7 +107,6 @@ namespace Simulation
 		}
 
 		internal void AssignJobs() {
-			/*
 			for (int priority = Job.Critical; priority < Job.PriorityCount; priority++ ) {
 				var idle = actorManager.GetIdleActors();
 				if ( !idle.Any() ) {
@@ -130,7 +130,7 @@ namespace Simulation
 					Console.WriteLine( first.Actor.ToString() );
 				}
 			}
-			*/
 		}
+	*/
     }
 }

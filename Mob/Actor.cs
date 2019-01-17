@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Threading;
 using Pathfinding;
 using Surface;
+using Work;
 
 namespace Mob {
-	public class Actor : IPathfindingCallback {
+	public class Actor : IPathfindingCallback, IJobFit {
 		private Route _path;
 		private Route _pendingPath;
+
+		public const int NoContext = 0;
+		public const int MoveContext = 1;
+		public const int MeasureContext = 2;
 
 		public Actor(
 			int column,
@@ -40,14 +45,21 @@ namespace Mob {
 		}
 
 		// This will be called from the Pathfinding thread
-		void IPathfindingCallback.PathFound( Route path ) {
+		void IPathfindingCallback.PathFound( Route path, int context ) {
+			if (context == MoveContext) {
+				var oldPendingPath = Interlocked.Exchange( ref _pendingPath, path );
 
-			var oldPendingPath = Interlocked.Exchange( ref _pendingPath, path );
+				if( oldPendingPath != default( Route ) ) {
+					// We updated the pending pathing before it was ever seen
+					// by the UI thread.
+				}
+			} else if (context == MeasureContext ) {
 
-			if ( oldPendingPath != default(Route)) {
-				// We updated the pending pathing before it was ever seen
-				// by the UI thread.
 			}
+		}
+
+		int IJobFit.GetFitness( Job job ) {
+			return 100;
 		}
 	}
 }

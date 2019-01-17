@@ -42,7 +42,7 @@ namespace Mob {
 		private void MoveActor(Map map, Actor actor, MapCell goal) {
 			MakeBusy( actor );
 			ref var source = ref map.GetCell( actor.Column, actor.Row );
-			_pathfindingManager.GetPath( map, ref source, ref goal, actor.Locomotion, actor );
+			_pathfindingManager.GetPath( map, ref source, ref goal, actor.Locomotion, actor, Actor.MoveContext );
 		}
 
 		private void MakeBusy(Actor actor) {

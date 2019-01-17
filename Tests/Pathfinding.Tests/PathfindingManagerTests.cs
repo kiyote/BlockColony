@@ -122,7 +122,7 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void GetPath_ValidPath_CallbackReceived() {
-			_manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, _callback );
+			_manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, _callback, 0 );
 			_gate.WaitOne( DELAY_MS );
 
 			Assert.That( _callback.CallbackCount, Is.EqualTo( 1 ) );
@@ -136,7 +136,7 @@ namespace Pathfinding.Tests {
 
 			try {
 				Assert.That( () => {
-					manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback );
+					manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback, 0 );
 				}, Throws.InvalidOperationException );
 			} finally {
 				manager.Stop();
@@ -168,7 +168,7 @@ namespace Pathfinding.Tests {
 				}
 			}
 
-			public void PathFound( Route path ) {
+			public void PathFound( Route path, int context ) {
 				Interlocked.Exchange( ref _path, path );
 				CallbackCount += 1;
 				_event.Set();

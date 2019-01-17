@@ -2,6 +2,6 @@
 
 namespace Pathfinding {
 	public interface IPathfindingCallback {
-		void PathFound( Route route );
+		void PathFound( Route route, int context );
 	}
 }

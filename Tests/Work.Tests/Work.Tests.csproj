@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Pathfinding\Pathfinding.csproj" />
     <ProjectReference Include="..\..\Work\Work.csproj" />
   </ItemGroup>
 

@@ -10,6 +10,7 @@ namespace Simulation.Tests {
 	[TestFixture]
 	public class SimulationManagerTests {
 
+		/*
 		private JobManager _jobManager;
 		private ActorManager _actorManager;
 		private SimulationManager _manager;
@@ -23,7 +24,7 @@ namespace Simulation.Tests {
 
 			_pathfindingManager = new PathfindingManager();
 			_actorManager = new ActorManager(_pathfindingManager);
-			_jobManager = new JobManager(_pathfindingManager);
+			_jobManager = new JobManager();
 			_manager = new SimulationManager(
 				_jobManager,
 				_actorManager,
@@ -52,5 +53,6 @@ namespace Simulation.Tests {
 				cell.Walkability = (byte)Direction.All;
 			}
 		}
+		*/
 	}
 }

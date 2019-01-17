@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mob\Mob.csproj" />
     <ProjectReference Include="..\Surface\Surface.csproj" />
   </ItemGroup>
 

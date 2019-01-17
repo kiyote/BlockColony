@@ -12,12 +12,9 @@ namespace Pathfinding {
 		private ConcurrentQueue<PathRequest> _requests;
 		private IPathfinder _pathfinder;
 		private bool _isRunning;
+		private bool _isPaused;
 
-		public interface IPathingToken {
-			void Cancel();
-		}
-
-		private class PathRequest: IPathingToken {
+		private class PathRequest {
 			public Map Map;
 			public int StartColumn;
 			public int StartRow;
@@ -25,11 +22,7 @@ namespace Pathfinding {
 			public int GoalRow;
 			public Locomotion Locomotion;
 			public IPathfindingCallback Callback;
-			public bool Cancelled;
-
-			void IPathingToken.Cancel() {
-				Cancelled = true;
-			}
+			public int CallbackContext;
 		}
 
 		public PathfindingManager()
@@ -42,10 +35,8 @@ namespace Pathfinding {
 		) {
 			_gate = new AutoResetEvent( false );
 			_pathfinder = pathfinder;
-			_thread = new Thread( Run ) {
-				Name = "Pathfinding Thread"
-			};
 			_isRunning = false;
+			_isPaused = false;
 			_requests = new ConcurrentQueue<PathRequest>();
 		}
 
@@ -59,7 +50,7 @@ namespace Pathfinding {
 			}
 		}
 
-		public IPathingToken GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion, IPathfindingCallback callback ) {
+		public void GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion, IPathfindingCallback callback, int callbackContext ) {
 			if( !_isRunning ) {
 				throw new InvalidOperationException( "Attempt to path with stopped pathfinding manager." );
 			}
@@ -71,16 +62,18 @@ namespace Pathfinding {
 				GoalColumn = goal.Column,
 				GoalRow = goal.Row,
 				Locomotion = locomotion,
-				Callback = callback
+				Callback = callback,
+				CallbackContext = callbackContext
 			};
 			_requests.Enqueue( request );
 			_gate.Set();
-
-			return request;
 		}
 
 		public void Start() {
 			if( !_isRunning ) {
+				_thread = new Thread( Run ) {
+					Name = "Pathfinding Thread"
+				};
 				_thread.Start();
 			}
 		}
@@ -103,18 +96,16 @@ namespace Pathfinding {
 						break;
 					}
 					if( _requests.TryDequeue( out PathRequest request ) ) {
-						if (!request.Cancelled) {
-							var path = _pathfinder.GetPath(
-								request.Map,
-								ref request.Map.GetCell( request.StartColumn, request.StartRow ),
-								ref request.Map.GetCell( request.GoalColumn, request.GoalRow ),
-								request.Locomotion );
-							request.Callback.PathFound( path );
-						}
+						var path = _pathfinder.GetPath(
+							request.Map,
+							ref request.Map.GetCell( request.StartColumn, request.StartRow ),
+							ref request.Map.GetCell( request.GoalColumn, request.GoalRow ),
+							request.Locomotion );
+						request.Callback.PathFound( path, request.CallbackContext );
 					}
 
 				}
-				_gate.WaitOne( 5000 ); // Automatically unlock after 5s just in case
+				_gate.WaitOne( 1000 ); // Automatically unlock after 1s just in case
 			}
 			_isRunning = false;
 			Stopped?.Invoke( this, EventArgs.Empty );
