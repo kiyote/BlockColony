@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pathfinding\Pathfinding.csproj" />
+    <ProjectReference Include="..\Surface\Surface.csproj" />
+    <ProjectReference Include="..\Work\Work.csproj" />
+  </ItemGroup>
+
+</Project>
