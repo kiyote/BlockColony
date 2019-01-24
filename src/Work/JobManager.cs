@@ -83,6 +83,13 @@ namespace Work {
 					var fits = _jobFitProvider.GetAvailable();
 					fits = FilterSuitable( job, fits );
 
+					if (fits.Length == 0) {
+						// No one available to handle the job
+						// Re-queue it and leave
+						AddJob( job );
+						break;
+					} 
+
 					StartPathing( job, fits );
 					CalculateNonPathFit( job, fits );
 					while( !PathingComplete() && !_terminated ) {
@@ -90,11 +97,17 @@ namespace Work {
 					}
 
 					IJobFit handler = fits[ FindJobFit( fits ) ];
-					Job oldJob = handler.AssignJob( job );
-					if (oldJob != default(Job)) {
-						// We assigned them a new job before they started the
-						// old one, so requeue this one
-						AddJob( oldJob );
+
+					if( handler == default( IJobFit ) ) {
+						// We couldn't find a handler for this job so we should
+						// put it in the blocked jobs to be re-queued periodically
+					} else {
+						Job oldJob = handler.AssignJob( job );
+						if( oldJob != default( Job ) ) {
+							// We assigned them a new job before they started the
+							// old one, so requeue this one
+							AddJob( oldJob );
+						}
 					}
 
 					if( !_terminated ) {
@@ -148,7 +161,7 @@ namespace Work {
 		// able to take on the specified job.  This way we don't do any work
 		// that would be discarded anyway.
 		private IJobFit[] FilterSuitable( Job job, IJobFit[] fits ) {
-			return fits;  // TODO: For now...
+			return fits;  // TODO: For now every fit is applicable
 		}
 
 		private void ClearFoundRoutes() {
