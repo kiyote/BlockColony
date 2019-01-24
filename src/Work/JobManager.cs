@@ -130,7 +130,7 @@ namespace Work {
 
 		private void CalculateNonPathFit( Job job, IJobFit[] fits ) {
 			for( int i = 0; i < fits.Length; i++ ) {
-				_fitness[ i ] = 100; // TODO: Actual work
+				_fitness[ i ] = 100; // TODO: actually calculate a fitness score
 			}
 		}
 

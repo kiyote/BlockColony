@@ -50,14 +50,14 @@ namespace Work.Tests {
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
 			var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
+			var manager = new JobManager( this, _pathfindingManager );
 			var startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
 			};
 
-			manager.Start();
+			manager.Start( _map );
 
 			gate.WaitOne( DELAY_MS );
 			manager.Stop();
@@ -68,16 +68,16 @@ namespace Work.Tests {
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
 			var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
+			var manager = new JobManager( this, _pathfindingManager );
 			var startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
 			};
-			manager.Start();
+			manager.Start( _map );
 			gate.WaitOne( DELAY_MS );
 
-			manager.Start();
+			manager.Start( _map );
 			gate.WaitOne( DELAY_MS );
 
 			manager.Stop();
@@ -88,7 +88,7 @@ namespace Work.Tests {
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
 			var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
+			var manager = new JobManager( this, _pathfindingManager );
 			var stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
@@ -97,7 +97,7 @@ namespace Work.Tests {
 				stopCount += 1;
 				gate.Set();
 			};
-			manager.Start();
+			manager.Start( _map );
 			gate.WaitOne( DELAY_MS );
 
 			manager.Stop();
@@ -109,7 +109,7 @@ namespace Work.Tests {
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
 			var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
+			var manager = new JobManager( this, _pathfindingManager );
 			var stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
@@ -118,7 +118,7 @@ namespace Work.Tests {
 				stopCount += 1;
 				gate.Set();
 			};
-			manager.Start();
+			manager.Start( _map );
 			gate.WaitOne( DELAY_MS );
 			manager.Stop();
 			gate.WaitOne( DELAY_MS );
@@ -130,30 +130,54 @@ namespace Work.Tests {
 		}
 
 		[Test]
-		public void GetPath_ValidPath_CallbackReceived() {
-			/*
-			_manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, _callback, 0 );
-			_gate.WaitOne( DELAY_MS );
+		public void AddJob_OneFit_JobAssigned() {
+			var gate = new AutoResetEvent( false );
 
-			Assert.That( _callback.CallbackCount, Is.EqualTo( 1 ) );
-			*/
+			var fit = new TestJobFit( gate );
+			_fits = new IJobFit[ 1 ] {
+				fit
+			};
+
+			var job = new Job( Job.Medium, new Activity[ 1 ] {
+				new Activity(
+					new Step[1] {
+						new Step(Errand.MoveTo, _map.HalfColumns, _map.HalfRows)
+					}
+				)
+			} );
+
+			_manager.AddJob( job );
+			gate.WaitOne( DELAY_MS );
+
+			Assert.AreSame( job, fit.Job );
 		}
 
 		[Test]
-		public void GetPath_ManagerNotStarted_ThrowsException() {
-			/*
+		public void AddJob_TwoFits_CloserFitChosen() {
 			var gate = new AutoResetEvent( false );
-			var callback = new PathfindingCallback( gate );
-			var manager = new JobManager();
 
-			try {
-				Assert.That( () => {
-					manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback, 0 );
-				}, Throws.InvalidOperationException );
-			} finally {
-				manager.Stop();
-			}
-			*/
+			var fit1 = new TestJobFit( gate );
+			var fit2 = new TestJobFit( gate );
+			fit2.LocationColumn = _map.HalfColumns - 1;
+			fit2.LocationRow = _map.HalfRows - 1;
+			_fits = new IJobFit[ 2 ] {
+				fit1,
+				fit2
+			};
+
+			var job = new Job( Job.Medium, new Activity[ 1 ] {
+				new Activity(
+					new Step[1] {
+						new Step(Errand.MoveTo, _map.HalfColumns, _map.HalfRows)
+					}
+				)
+			} );
+
+			_manager.AddJob( job );
+			gate.WaitOne( DELAY_MS );
+
+			Assert.IsNull( fit1.Job );
+			Assert.AreSame( job, fit2.Job );
 		}
 
 		IJobFit[] IJobFitProvider.GetAvailable() {
@@ -165,6 +189,29 @@ namespace Work.Tests {
 				cell.TerrainCost = 100;
 				cell.Walkability = (byte)Direction.All;
 			}
+		}
+
+		private class TestJobFit : IJobFit {
+
+			private AutoResetEvent _gate;
+
+			public TestJobFit(AutoResetEvent gate) {
+				_gate = gate;
+			}
+
+			public int LocationColumn { get; set; }
+
+			public int LocationRow { get; set; }
+
+			public Locomotion Locomotion { get; set; }
+
+			public Job AssignJob( Job job ) {
+				Job = job;
+				_gate.Set();
+				return null;
+			}
+
+			public Job Job { get; set; }
 		}
 	}
 }
