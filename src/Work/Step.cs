@@ -4,16 +4,16 @@ namespace Work {
 	public class Step: IEquatable<Step> {
 
 		public Step(
-			Errand activity, 
+			Errand errand, 
 			int column, 
 			int row
 		) {
-			Activity = activity;
+			Errand = errand;
 			Column = column;
 			Row = row;
 		}
 
-		public Errand Activity { get; }
+		public Errand Errand { get; }
 
 		public int Column { get; }
 
@@ -28,7 +28,7 @@ namespace Work {
 				return true;
 			}
 
-			return Activity == other.Activity
+			return Errand == other.Errand
 				&& Column == other.Column
 				&& Row == other.Row;
 		}
@@ -39,7 +39,7 @@ namespace Work {
 
 		public override int GetHashCode() {
 			unchecked {
-				int result = (sbyte)Activity;
+				int result = (sbyte)Errand;
 				result = ( result * 31 ) + Column;
 				result = ( result * 31 ) + Row;
 

@@ -1,58 +1,92 @@
 ﻿using System;
 using NUnit.Framework;
-using Mob;
-using Work;
-using Pathfinding;
-using Surface;
-using Work.Actions;
+using System.Threading;
 
 namespace Simulation.Tests {
 	[TestFixture]
 	public class SimulationManagerTests {
+		private const int DELAY_MS = 500;
 
-		/*
-		private JobManager _jobManager;
-		private ActorManager _actorManager;
-		private SimulationManager _manager;
-		private PathfindingManager _pathfindingManager;
-		private IPathfinder _pathfinder;
-		private Map _map;
+		[Test]
+		public void Start_NotStarted_ThreadStarted() {
+			var gate = new AutoResetEvent( false );
+			var manager = new SimulationManager();
+			var startCount = 0;
+			manager.Started += ( _, __ ) => {
+				startCount += 1;
+				gate.Set();
+			};
 
-		[OneTimeSetUp]
-		public void OneTimeSetUp() {
-			_map = new Map( 10, 10, new DefaultInitializer() );
+			manager.Start();
 
-			_pathfindingManager = new PathfindingManager();
-			_actorManager = new ActorManager(_pathfindingManager);
-			_jobManager = new JobManager();
-			_manager = new SimulationManager(
-				_jobManager,
-				_actorManager,
-				_map );
+			gate.WaitOne( DELAY_MS );
+			manager.Stop();
+
+			Assert.That( startCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
-		public void AssignJobs_OneActorOneJob_JobFound() {
-			var job = new Job( Job.Medium, new Activity[] {
-				new DigTileAction( ref _map.GetCell( 5, 5 ) )
-				} );
-			_jobManager.Add( job );
+		public void Start_AlreadyStarted_NoEffect() {
+			var gate = new AutoResetEvent( false );
+			var manager = new SimulationManager();
+			var startCount = 0;
+			manager.Started += ( _, __ ) => {
+				startCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-			_actorManager.Add( new Actor(
-				column: 1,
-				row: 1,
-				locomotion: Locomotion.Walk
-			) );
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-			//_manager.AssignJobs( _actorManager, _jobManager, _pathfinder );
+			manager.Stop();
+
+			Assert.That( startCount, Is.EqualTo( 1 ) );
 		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Do( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Direction.All;
-			}
+		[Test]
+		public void Stop_NotStarted_NoEffect() {
+			var gate = new AutoResetEvent( false );
+			var manager = new SimulationManager();
+			var stopCount = 0;
+			manager.Started += ( _, __ ) => {
+				gate.Set();
+			};
+			manager.Stopped += ( _, __ ) => {
+				stopCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
+
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
+
+			Assert.That( stopCount, Is.EqualTo( 1 ) );
 		}
-		*/
+
+		[Test]
+		public void Stop_AlreadyStarted_ThreadStopped() {
+			var gate = new AutoResetEvent( false );
+			var manager = new SimulationManager();
+			var stopCount = 0;
+			manager.Started += ( _, __ ) => {
+				gate.Set();
+			};
+			manager.Stopped += ( _, __ ) => {
+				stopCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
+
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
+
+			Assert.That( stopCount, Is.EqualTo( 1 ) );
+		}
 	}
 }

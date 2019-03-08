@@ -7,6 +7,8 @@ using Pathfinding;
 
 namespace Work {
 	public class JobManager : IPathfindingCallback {
+		public const int INITIAL_MAXIMUM = 100;
+
 		private readonly List<Job>[] _jobs;
 		private Thread _thread;
 		private AutoResetEvent _gate;
@@ -36,8 +38,8 @@ namespace Work {
 			_pendingJobs = new ConcurrentQueue<Job>();
 			_pathfindingManager = pathfindingManager;
 
-			_foundRoutes = new Route[ 100 ];
-			_fitness = new int[ 100 ];
+			_foundRoutes = new Route[ INITIAL_MAXIMUM ];
+			_fitness = new int[ INITIAL_MAXIMUM ];
 		}
 
 #if DEBUG
@@ -80,7 +82,10 @@ namespace Work {
 
 				Job job = GetNextJob();
 				while( job != default( Job ) ) {
+					// All the people available to handle the job
 					var fits = _jobFitProvider.GetAvailable();
+					// Of those, the people who could possibly handle the job
+					// (ie - has the right skill)
 					fits = FilterSuitable( job, fits );
 
 					if (fits.Length == 0) {
@@ -90,7 +95,11 @@ namespace Work {
 						break;
 					} 
 
+					// Now we calculate the distance to the job for everyone
+					// left, blocking until the pathing is complete
 					StartPathing( job, fits );
+					// Non-path fitness is "suitability" for the job.  ie - Those 
+					// with higher skills are more fit than those with lower skills.
 					CalculateNonPathFit( job, fits );
 					while( !PathingComplete() && !_terminated ) {
 						_gate.WaitOne();
@@ -101,6 +110,7 @@ namespace Work {
 					if( handler == default( IJobFit ) ) {
 						// We couldn't find a handler for this job so we should
 						// put it in the blocked jobs to be re-queued periodically
+						// TODO: create a blocked job queue
 					} else {
 						Job oldJob = handler.AssignJob( job );
 						if( oldJob != default( Job ) ) {
@@ -128,6 +138,10 @@ namespace Work {
 #endif
 		}
 
+		// Determines the non-path fitness vs the pathing fitness so that
+		// you're more likely to be picked for the job the closer you are,
+		// weighted towards people of higher skill at equal distances being
+		// chosen.
 		private int FindJobFit( IJobFit[] fits ) {
 			int result = -1;
 			int bestFit = int.MinValue;
