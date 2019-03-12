@@ -5,6 +5,7 @@ using Surface;
 using NUnit.Framework;
 
 namespace Pathfinding.Tests {
+#if DEBUG
 	[TestFixture]
 	public class PathfindingManagerTests {
 		private const int DELAY_MS = 500;
@@ -175,4 +176,5 @@ namespace Pathfinding.Tests {
 			}
 		}
 	}
+#endif
 }

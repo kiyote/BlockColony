@@ -10,23 +10,25 @@ namespace Work {
 		public const int INITIAL_MAXIMUM = 100;
 
 		private readonly List<Job>[] _jobs;
-		private Thread _thread;
-		private AutoResetEvent _gate;
+		private readonly AutoResetEvent _gate;
 		private readonly ConcurrentQueue<Job> _pendingJobs;
 		private readonly IJobFitProvider _jobFitProvider;
+		private readonly IMapProvider _mapProvider;
+		private readonly PathfindingManager _pathfindingManager;
+
+		private Thread _thread;
 		private bool _terminated;
 		private bool _isRunning;
-		private Map _map;
-		private PathfindingManager _pathfindingManager;
-
 		private Route[] _foundRoutes;
 		private int[] _fitness;
 		private int _pendingRoutes;
 
 		public JobManager(
 			IJobFitProvider jobFitProvider,
-			PathfindingManager pathfindingManager
+			PathfindingManager pathfindingManager,
+			IMapProvider mapProvider
 		) {
+			_mapProvider = mapProvider;
 			_jobFitProvider = jobFitProvider;
 			_jobs = new List<Job>[ Job.PriorityCount ];
 			for( int i = 0; i < _jobs.Length; i++ ) {
@@ -45,7 +47,7 @@ namespace Work {
 #if DEBUG
 		public event EventHandler Started;
 		public event EventHandler Stopped;
-#endif 
+#endif
 
 		public void AddJob( Job job ) {
 			if( !_isRunning ) {
@@ -55,9 +57,8 @@ namespace Work {
 			_gate.Set();
 		}
 
-		public void Start( Map map ) {
+		public void Start() {
 			if( !_isRunning ) {
-				_map = map;
 				_thread = new Thread( Run ) {
 					Name = "Job Thread"
 				};
@@ -82,22 +83,24 @@ namespace Work {
 
 				Job job = GetNextJob();
 				while( job != default( Job ) ) {
+					var map = _mapProvider.Get();
+
 					// All the people available to handle the job
 					var fits = _jobFitProvider.GetAvailable();
 					// Of those, the people who could possibly handle the job
 					// (ie - has the right skill)
 					fits = FilterSuitable( job, fits );
 
-					if (fits.Length == 0) {
+					if( fits.Length == 0 ) {
 						// No one available to handle the job
 						// Re-queue it and leave
 						AddJob( job );
 						break;
-					} 
+					}
 
 					// Now we calculate the distance to the job for everyone
 					// left, blocking until the pathing is complete
-					StartPathing( job, fits );
+					StartPathing( map, job, fits );
 					// Non-path fitness is "suitability" for the job.  ie - Those 
 					// with higher skills are more fit than those with lower skills.
 					CalculateNonPathFit( job, fits );
@@ -145,9 +148,9 @@ namespace Work {
 		private int FindJobFit( IJobFit[] fits ) {
 			int result = -1;
 			int bestFit = int.MinValue;
-			for (int i = 0; i < fits.Length; i++ ) {
-				if ((_fitness[i] - _foundRoutes[i].Count) > bestFit) {
-					bestFit = (_fitness[ i ] - _foundRoutes[ i ].Count);
+			for( int i = 0; i < fits.Length; i++ ) {
+				if( ( _fitness[ i ] - _foundRoutes[ i ].Count ) > bestFit ) {
+					bestFit = ( _fitness[ i ] - _foundRoutes[ i ].Count );
 					result = i;
 				}
 			}
@@ -201,7 +204,7 @@ namespace Work {
 			return result;
 		}
 
-		private void StartPathing( Job job, IJobFit[] fits ) {
+		private void StartPathing( Map map, Job job, IJobFit[] fits ) {
 
 			if( fits.Length > _foundRoutes.Length ) {
 				_foundRoutes = new Route[ fits.Length ];
@@ -213,9 +216,9 @@ namespace Work {
 				var fit = fits[ i ];
 				var activity = job.Activity[ 0 ];
 				var step = activity.Step[ 0 ];
-				ref var location = ref _map.GetCell( fit.LocationColumn, fit.LocationRow );
-				ref var target = ref _map.GetCell( step.Column, step.Row );
-				_pathfindingManager.GetPath( _map, ref location, ref target, fit.Locomotion, this, i );
+				ref var location = ref map.GetCell( fit.LocationColumn, fit.LocationRow );
+				ref var target = ref map.GetCell( step.Column, step.Row );
+				_pathfindingManager.GetPath( map, ref location, ref target, fit.Locomotion, this, i );
 			}
 		}
 

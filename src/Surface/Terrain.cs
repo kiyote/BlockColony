@@ -32,7 +32,7 @@ namespace Surface {
 
 		string IdName { get; }
 
-		ITerrainAttributes this[int celcius] { get; }
+		ITerrainAttributes this[ int celcius ] { get; }
 	}
 
 	internal class Terrain : ITerrain {
@@ -52,7 +52,7 @@ namespace Surface {
 
 		public string IdName { get; }
 
-		public ITerrainAttributes this[int celcius] {
+		public ITerrainAttributes this[ int celcius ] {
 			get {
 				return _attributes.Last( a => a.Key < celcius ).Value;
 			}

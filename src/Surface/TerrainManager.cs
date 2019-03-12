@@ -13,9 +13,9 @@ namespace Surface {
 			_terrain = new Dictionary<int, Terrain>();
 		}
 
-		public ITerrain this[int id] {
+		public ITerrain this[ int id ] {
 			get {
-				return _terrain[id];
+				return _terrain[ id ];
 			}
 		}
 
@@ -32,7 +32,7 @@ namespace Surface {
 					return (transition: p.Transition, attribute: p as ITerrainAttributes);
 				} ) );
 
-				_terrain[terrain.Id] = terrain;
+				_terrain[ terrain.Id ] = terrain;
 			}
 		}
 

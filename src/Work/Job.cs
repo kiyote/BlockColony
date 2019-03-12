@@ -9,9 +9,9 @@ namespace Work {
 		public const int High = 2;
 		public const int Critical = 0;
 
-		public Job( 
-			int priority, 
-			Activity[] activities 
+		public Job(
+			int priority,
+			Activity[] activities
 		) {
 			Priority = priority;
 			Activity = activities ?? throw new InvalidOperationException();

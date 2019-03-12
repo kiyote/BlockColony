@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using NUnit.Framework;
 using Pathfinding;
 using Surface;
-using Work.Actions;
 
 namespace Work.Tests {
+#if DEBUG
 	[TestFixture]
-	public class JobManagerTests : IJobFitProvider {
+	public class JobManagerTests : IJobFitProvider, IMapProvider {
 		private const int DELAY_MS = 500;
 		private AutoResetEvent _gate;
 		private JobManager _manager;
@@ -29,15 +26,14 @@ namespace Work.Tests {
 			_pathfindingManager.Stop();
 		}
 
-
 		[SetUp]
 		public void SetUp() {
 			_gate = new AutoResetEvent( false );
-			_manager = new JobManager( this, _pathfindingManager );
+			_manager = new JobManager( this, _pathfindingManager, this );
 			_manager.Started += ( _, __ ) => {
 				_gate.Set();
 			};
-			_manager.Start( _map );
+			_manager.Start();
 			_gate.WaitOne( DELAY_MS );
 		}
 
@@ -50,14 +46,14 @@ namespace Work.Tests {
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
 			var gate = new AutoResetEvent( false );
-			var manager = new JobManager( this, _pathfindingManager );
+			var manager = new JobManager( this, _pathfindingManager, this );
 			var startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
 			};
 
-			manager.Start( _map );
+			manager.Start();
 
 			gate.WaitOne( DELAY_MS );
 			manager.Stop();
@@ -68,16 +64,16 @@ namespace Work.Tests {
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
 			var gate = new AutoResetEvent( false );
-			var manager = new JobManager( this, _pathfindingManager );
+			var manager = new JobManager( this, _pathfindingManager, this );
 			var startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
 			};
-			manager.Start( _map );
+			manager.Start();
 			gate.WaitOne( DELAY_MS );
 
-			manager.Start( _map );
+			manager.Start();
 			gate.WaitOne( DELAY_MS );
 
 			manager.Stop();
@@ -88,7 +84,7 @@ namespace Work.Tests {
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
 			var gate = new AutoResetEvent( false );
-			var manager = new JobManager( this, _pathfindingManager );
+			var manager = new JobManager( this, _pathfindingManager, this );
 			var stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
@@ -97,7 +93,7 @@ namespace Work.Tests {
 				stopCount += 1;
 				gate.Set();
 			};
-			manager.Start( _map );
+			manager.Start();
 			gate.WaitOne( DELAY_MS );
 
 			manager.Stop();
@@ -109,7 +105,7 @@ namespace Work.Tests {
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
 			var gate = new AutoResetEvent( false );
-			var manager = new JobManager( this, _pathfindingManager );
+			var manager = new JobManager( this, _pathfindingManager, this );
 			var stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
@@ -118,7 +114,7 @@ namespace Work.Tests {
 				stopCount += 1;
 				gate.Set();
 			};
-			manager.Start( _map );
+			manager.Start();
 			gate.WaitOne( DELAY_MS );
 			manager.Stop();
 			gate.WaitOne( DELAY_MS );
@@ -191,6 +187,10 @@ namespace Work.Tests {
 			}
 		}
 
+		Map IMapProvider.Get() {
+			return _map;
+		}
+
 		private class TestJobFit : IJobFit {
 
 			private AutoResetEvent _gate;
@@ -214,4 +214,5 @@ namespace Work.Tests {
 			public Job Job { get; set; }
 		}
 	}
+#endif
 }

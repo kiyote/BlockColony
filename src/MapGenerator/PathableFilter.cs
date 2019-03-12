@@ -11,7 +11,7 @@ namespace MapGenerator {
 		}
 
 		bool IMapFunction<bool>.Do( ref MapCell cell ) {
-			var terrain = _manager[cell.TerrainId][cell.Temperature];
+			var terrain = _manager[ cell.TerrainId ][ cell.Temperature ];
 			return terrain.Pathable;
 		}
 	}

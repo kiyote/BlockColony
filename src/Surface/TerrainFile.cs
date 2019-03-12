@@ -30,5 +30,4 @@ namespace Surface {
 
 		public TerrainConfig[] Terrain { get; set; }
 	}
-
 }

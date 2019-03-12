@@ -1,11 +1,11 @@
 ﻿using System;
 
 namespace Work {
-	public class Step: IEquatable<Step> {
+	public class Step : IEquatable<Step> {
 
 		public Step(
-			Errand errand, 
-			int column, 
+			Errand errand,
+			int column,
 			int row
 		) {
 			Errand = errand;
@@ -20,11 +20,11 @@ namespace Work {
 		public int Row { get; }
 
 		public bool Equals( Step other ) {
-			if (ReferenceEquals(other, null)) {
+			if( ReferenceEquals( other, null ) ) {
 				return false;
 			}
 
-			if (ReferenceEquals(other, this)) {
+			if( ReferenceEquals( other, this ) ) {
 				return true;
 			}
 

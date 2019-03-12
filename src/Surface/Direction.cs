@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 namespace Surface {
 	[JsonConverter( typeof( StringEnumConverter ) )]
 	[Flags]
-    public enum Direction: byte {
+	public enum Direction : byte {
 
 		North = 0b0001,
 
@@ -24,5 +24,5 @@ namespace Surface {
 		NorthWest = 0b1001,
 
 		All = 0b1111
-    }
+	}
 }

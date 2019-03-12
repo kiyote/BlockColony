@@ -24,8 +24,7 @@ namespace Pathfinding {
 		}
 
 		public PathfindingManager()
-			:this( new AStarPathfinder()) 
-		{
+			: this( new AStarPathfinder() ) {
 		}
 
 		public PathfindingManager(
@@ -37,9 +36,11 @@ namespace Pathfinding {
 			_requests = new ConcurrentQueue<PathRequest>();
 		}
 
+#if DEBUG
 		// These run on the Pathfinding thread, so use them at your own risk
 		public event EventHandler Started;
 		public event EventHandler Stopped;
+#endif
 
 		public bool IsRunning { get; private set; }
 
@@ -81,7 +82,9 @@ namespace Pathfinding {
 
 		private void Run() {
 			IsRunning = true;
+#if DEBUG
 			Started?.Invoke( this, EventArgs.Empty );
+#endif
 			while( !_terminated ) {
 
 				while( !_requests.IsEmpty ) {
@@ -101,7 +104,9 @@ namespace Pathfinding {
 				_gate.WaitOne( 1000 ); // Automatically unlock after 1s just in case
 			}
 			IsRunning = false;
+#if DEBUG
 			Stopped?.Invoke( this, EventArgs.Empty );
+#endif
 		}
 	}
 }

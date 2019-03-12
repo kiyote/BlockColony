@@ -105,7 +105,7 @@ namespace MapGenerator {
 			LayerTerrainOptions terrainOptions
 		) {
 			var terrain = terrainManager.GetByIdName( terrainOptions.IdName );
-			for (int row = 0; row < map.Rows; row++) {
+			for( int row = 0; row < map.Rows; row++ ) {
 
 				var counter = 0;
 				bool terrainUpdated = false;
@@ -189,6 +189,5 @@ namespace MapGenerator {
 				}
 			}
 		}
-
 	}
 }

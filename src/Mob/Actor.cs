@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using Pathfinding;
 using Surface;
@@ -11,7 +10,6 @@ namespace Mob {
 		private Route _pendingRoute;
 		private Job _job;
 		private Job _pendingJob;
-		private bool _hasJob;
 		private int _currentRouteIndex;
 
 		private int _currentActivity;
@@ -23,6 +21,7 @@ namespace Mob {
 
 #if DEBUG
 		public event EventHandler JobAssigned;
+		public event EventHandler PathAssigned;
 #endif
 
 		public Actor(
@@ -36,34 +35,44 @@ namespace Mob {
 			_currentRouteIndex = -1;
 			_currentActivity = -1;
 			_currentStep = -1;
+			Errand = Errand.Idle;
 		}
 
-		public int Column { get; }
+		public int Column { get; private set; }
 
-		public int Row { get; }
+		public int Row { get; private set; }
 
 		public Locomotion Locomotion { get; }
 
-		public bool HasJob { get; private set; }
+		public Errand Errand { get; private set; }
 
 		// This will be called from the Simulation thread
 		public void SimulationUpdate() {
 			if( _route == default( Route ) ) {
 				_route = Interlocked.Exchange( ref _pendingRoute, default( Route ) );
-				_currentRouteIndex = -1;
+
+				if( _route != default( Route ) ) {
+					_currentRouteIndex = 0;
+				}
 			}
 
 			if( _job == default( Job ) ) {
 				_job = Interlocked.Exchange( ref _pendingJob, default( Job ) );
-				_currentActivity = -1;
-				_currentStep = -1;
-			}
 
-			if( _route != default( Route ) ) {
-				if ( _currentRouteIndex == -1) {
-					_currentRouteIndex = 0;		
+				if( _job != default( Job ) ) {
+					_currentActivity = 0;
+					_currentStep = 0;
+					SetRouteRequired();
 				}
 			}
+		}
+
+		public Step GetActivityStep() {
+			if( _job == default( Job ) ) {
+				return default( Step );
+			}
+
+			return _job.Activity[ _currentActivity ].Step[ _currentStep ];
 		}
 
 		// Called from the Ui thread
@@ -76,52 +85,72 @@ namespace Mob {
 		}
 
 		// Called from the Ui thread
-		public void RouteStepComplete() {
+		public void RouteStepComplete( ref MapCell mapCell ) {
+			Column = mapCell.Column;
+			Row = mapCell.Row;
 			_currentRouteIndex += 1;
-			if ( _currentRouteIndex >= _route.Count) {
-				// TODO: What now, genius?!
+			if( _currentRouteIndex >= _route.Count ) {
 				_currentRouteIndex = -1;
 				_route = default( Route );
+				Errand = _job.Activity[ _currentActivity ].Step[ _currentStep ].Errand;
 			}
-		}
-
-		public Errand GetErrand() {
-			if (_currentStep == -1) {
-				_currentStep = 0;
-			}
-			return _job.Activity[ _currentActivity ].Step[ _currentStep ].Errand;
 		}
 
 		public void ErrandComplete() {
-			_currentStep += 1;
-			if (_currentStep >= _job.Activity[ _currentActivity ].Step.Length) {
-				StepComplete();
-			} else {
-				var step = _job.Activity[ _currentActivity ].Step[ _currentStep ];
-				if ((step.Column != Column)
-					|| (step.Row != Row)) {
-					// We need to path to the new location
+
+			if( Errand == Errand.WaitingToPath ) {
+				if( _route == default( Route ) ) {
+					throw new InvalidOperationException( "WaitingToPath marked complete with no route." );
 				}
+				Errand = Errand.Pathing;
+			} else {
+				_currentStep += 1;
+				if( _currentStep >= _job.Activity[ _currentActivity ].Step.Length ) {
+					StepComplete();
+				} else {
+					SetRouteRequired();
+				}
+			}
+		}
+
+		private void SetRouteRequired() {
+			var step = _job.Activity[ _currentActivity ].Step[ _currentStep ];
+			if( ( step.Column != Column )
+				|| ( step.Row != Row ) ) {
+				Errand = Errand.WaitingToPath;
+			} else {
+				Errand = step.Errand;
 			}
 		}
 
 		private void StepComplete() {
 			_currentActivity += 1;
-			if (_currentActivity >= _job.Activity.Length) {
+			_currentStep = 0;
+			if( _currentActivity >= _job.Activity.Length ) {
 				_job = default( Job );
+				_route = default( Route );
 				_currentActivity = -1;
 				_currentStep = -1;
 				_currentRouteIndex = -1;
+				Errand = Errand.Idle;
 			}
 		}
 
 		// This will be called from the Pathfinding thread
 		void IPathfindingCallback.PathFound( Route path, int context ) {
 			var oldPendingPath = Interlocked.Exchange( ref _pendingRoute, path );
-
+#if DEBUG
+			PathAssigned?.Invoke( this, EventArgs.Empty );
+#endif
 			if( oldPendingPath != default( Route ) ) {
-				// We updated the pending pathing before it was ever seen
-				// by the UI thread.
+				// We updated the pending pathing before it was ever seen by the UI thread.
+				throw new InvalidOperationException( "Route received before previous route accepted." );
+			}
+
+			if( Errand == Errand.WaitingToPath ) {
+				ErrandComplete();
+			} else {
+				throw new InvalidOperationException( "Route received with no pending request." );
 			}
 		}
 

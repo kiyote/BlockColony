@@ -5,7 +5,7 @@ using Surface;
 using Work;
 
 namespace Mob {
-	public class ActorManager: IJobFitProvider {
+	public class ActorManager : IJobFitProvider {
 		private readonly PathfindingManager _pathfindingManager;
 		private readonly List<Actor> _actors;
 		private readonly List<Actor> _idle;
@@ -19,7 +19,7 @@ namespace Mob {
 			_idle = new List<Actor>();
 		}
 
-		public void Add(Actor actor) {
+		public void Add( Actor actor ) {
 			_actors.Add( actor );
 
 			_idle.Add( actor );
@@ -34,26 +34,34 @@ namespace Mob {
 		}
 
 		// Called from the simulation thread
-		public void SimulationUpdate() {
-			foreach (var actor in _actors) {
+		public void SimulationUpdate( Map map ) {
+			foreach( var actor in _actors ) {
 				actor.SimulationUpdate();
+
+				if( actor.Errand == Errand.WaitingToPath ) {
+					var step = actor.GetActivityStep();
+					ref var target = ref map.GetCell( step.Column, step.Row );
+					ref var source = ref map.GetCell( actor.Column, actor.Row );
+					actor.ErrandComplete();
+					_pathfindingManager.GetPath( map, ref source, ref target, actor.Locomotion, actor, Actor.MoveContext );
+				}
 			}
 		}
 
-		private void MoveActor(Map map, Actor actor, MapCell goal) {
+		private void MoveActor( Map map, Actor actor, MapCell goal ) {
 			MakeBusy( actor );
 			ref var source = ref map.GetCell( actor.Column, actor.Row );
 			_pathfindingManager.GetPath( map, ref source, ref goal, actor.Locomotion, actor, Actor.MoveContext );
 		}
 
-		private void MakeBusy(Actor actor) {
-			_idle.Remove( actor );			
+		private void MakeBusy( Actor actor ) {
+			_idle.Remove( actor );
 		}
 
 		IJobFit[] IJobFitProvider.GetAvailable() {
 			var result = new List<Actor>();
-			for (int i = 0; i < _idle.Count; i++ ) {
-				if (!_idle[i].HasJob) {
+			for( int i = 0; i < _idle.Count; i++ ) {
+				if( _idle[ i ].Errand == Errand.Idle ) {
 					result.Add( _idle[ i ] );
 				}
 			}

@@ -10,15 +10,15 @@ namespace Surface {
 		//[Il2CppSetOption( Option.NullChecks, false )]
 		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		public Map( int columns, int rows, IMapMethod initializer ) {
-			if (initializer == default(IMapMethod)) {
+			if( initializer == default( IMapMethod ) ) {
 				throw new ArgumentException( nameof( initializer ) );
 			}
 
-			if (columns <= 0) {
+			if( columns <= 0 ) {
 				throw new ArgumentException( nameof( columns ) );
 			}
 
-			if (rows <= 0) {
+			if( rows <= 0 ) {
 				throw new ArgumentException( nameof( rows ) );
 			}
 
@@ -28,12 +28,12 @@ namespace Surface {
 			HalfColumns = columns / 2;
 			Rows = rows;
 			HalfRows = rows / 2;
-			_cells = new MapCell[columns * rows];
+			_cells = new MapCell[ columns * rows ];
 
 			for( int row = 0; row < rows; row++ ) {
 				for( int column = 0; column < columns; column++ ) {
 					var index = ( row * _rowSize ) + column;
-					ref var cell = ref _cells[index];
+					ref var cell = ref _cells[ index ];
 					cell.Column = (short)column;
 					cell.Row = (short)row;
 					cell.Index = index;
@@ -52,7 +52,7 @@ namespace Surface {
 		public int HalfRows { get; }
 
 		public ref MapCell GetCell( int index ) {
-			return ref _cells[index];
+			return ref _cells[ index ];
 		}
 
 		public ref MapCell GetCell( int column, int row ) {
@@ -60,7 +60,7 @@ namespace Surface {
 		}
 
 		public void ForEachNeighbour( int cellIndex, IMapNeighbourMethod method ) {
-			ref var cell = ref _cells[cellIndex];
+			ref var cell = ref _cells[ cellIndex ];
 			method.Do( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row - 1 ), Direction.NorthWest );
 			method.Do( ref cell, ref GetWrappedCell( cell.Column, cell.Row - 1 ), Direction.North );
 			method.Do( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row - 1 ), Direction.NorthEast );
@@ -76,8 +76,8 @@ namespace Surface {
 		//[Il2CppSetOption( Option.NullChecks, false )]
 		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		public int Cost( Locomotion locomotion, int sourceIndex, int targetIndex ) {
-			ref var source = ref _cells[sourceIndex];
-			ref var target = ref _cells[targetIndex];
+			ref var source = ref _cells[ sourceIndex ];
+			ref var target = ref _cells[ targetIndex ];
 			int result;
 
 			if( target.TerrainLevel != 0 ) {
@@ -133,7 +133,7 @@ namespace Surface {
 			}
 
 			int index = ( row * _rowSize ) + column;
-			return ref _cells[index];
+			return ref _cells[ index ];
 
 		}
 
