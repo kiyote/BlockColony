@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Surface;
 
 namespace MapGenerator {
@@ -11,7 +11,7 @@ namespace MapGenerator {
 		}
 
 		bool IMapFunction<bool>.Do( ref MapCell cell ) {
-			var terrain = _manager[ cell.TerrainId ][ cell.Temperature ];
+			ITerrainAttributes terrain = _manager[ cell.TerrainId ][ cell.Temperature ];
 			return terrain.Pathable;
 		}
 	}

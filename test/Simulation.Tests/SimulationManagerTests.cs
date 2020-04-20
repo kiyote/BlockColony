@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using System.Threading;
 using Mob;
@@ -14,16 +14,16 @@ namespace Simulation.Tests {
 
 		[SetUp]
 		public void SetUp() {
-			_actorManager = default( ActorManager );
-			_mapProvider = default( IMapProvider );
+			_actorManager = default;
+			_mapProvider = default;
 		}
 
 #if DEBUG
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new SimulationManager( _actorManager, _mapProvider );
-			var startCount = 0;
+			int startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
@@ -39,9 +39,9 @@ namespace Simulation.Tests {
 
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new SimulationManager( _actorManager, _mapProvider );
-			var startCount = 0;
+			int startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
@@ -59,9 +59,9 @@ namespace Simulation.Tests {
 
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new SimulationManager( _actorManager, _mapProvider );
-			var stopCount = 0;
+			int stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
 			};
@@ -80,9 +80,9 @@ namespace Simulation.Tests {
 
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new SimulationManager( _actorManager, _mapProvider );
-			var stopCount = 0;
+			int stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
 			};

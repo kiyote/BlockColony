@@ -112,7 +112,7 @@ namespace Pathfinding.AStar {
 			// adjacent (not diagonal) floor tile (1), newCost will be 2,
 			// or if the neighbor is diagonal, 1+Sqrt(2). And that will be the
 			// value assigned to costSoFar[neighbor] below.
-			var newCost = _costSoFar[_currentIndex] + _map.Cost( _locomotion, _currentIndex, neighbour.Index );
+			int newCost = _costSoFar[_currentIndex] + _map.Cost( _locomotion, _currentIndex, neighbour.Index );
 
 			// If there's no cost assigned to the neighbor yet, or if the new
 			// cost is lower than the assigned one, add newCost for this neighbor
@@ -126,8 +126,8 @@ namespace Pathfinding.AStar {
 
 				_costSoFar.Add( neighbour.Index, newCost );
 				_cameFrom.Add( neighbour.Index, _currentIndex );
-				ref var goal = ref _map.GetCell( _goalIndex );
-				var priority = newCost + Heuristic( _map, ref neighbour, ref goal );
+				ref MapCell goal = ref _map.GetCell( _goalIndex );
+				int priority = newCost + Heuristic( _map, ref neighbour, ref goal );
 				var neighbourNode = new AStarPriorityQueueNode {
 					CellIndex = neighbour.Index
 				};

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Work {
 	public class Job : IEquatable<Job> {
@@ -33,7 +33,7 @@ namespace Work {
 		//[Il2CppSetOption( Option.NullChecks, false )]
 		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		public bool Equals( Job other ) {
-			if( ReferenceEquals( other, null ) ) {
+			if( other is null ) {
 				return false;
 			}
 
@@ -48,8 +48,8 @@ namespace Work {
 				return false;
 			}
 
-			var sourceLength = Activity.Length;
-			var targetLength = other.Activity.Length;
+			int sourceLength = Activity.Length;
+			int targetLength = other.Activity.Length;
 
 			if( sourceLength != targetLength ) {
 				return false;
@@ -57,9 +57,9 @@ namespace Work {
 
 			for( int i = 0; i < sourceLength; i++ ) {
 				bool found = false;
-				ref var sourceAction = ref Activity[ i ];
+				ref Activity sourceAction = ref Activity[ i ];
 				for( int j = 0; j < targetLength; j++ ) {
-					ref var targetAction = ref other.Activity[ i ];
+					ref Activity targetAction = ref other.Activity[ i ];
 
 					if( sourceAction == targetAction ) {
 						found = true;
@@ -85,7 +85,7 @@ namespace Work {
 				int result = Priority;
 				result = ( result * 31 ) + Age;
 				result = ( result * 31 ) + State.GetHashCode();
-				var length = Activity.Length;
+				int length = Activity.Length;
 				for( int i = 0; i < length; i++ ) {
 					result = ( result * 31 ) + Activity[ i ].GetHashCode();
 				}

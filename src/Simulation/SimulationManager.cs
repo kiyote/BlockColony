@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Mob;
 using Surface;
@@ -7,7 +7,7 @@ using Work;
 namespace Simulation {
 	public class SimulationManager {
 		private Thread _thread;
-		private AutoResetEvent _gate;
+		private readonly AutoResetEvent _gate;
 		private bool _terminated;
 		private bool _isRunning;
 		private long _uiElapsedMilliseconds;
@@ -49,6 +49,7 @@ namespace Simulation {
 			}
 		}
 
+		// Call this from the UI thread
 		public void UiUpdate( long elapsedMilliseconds ) {
 			Interlocked.Add( ref _uiElapsedMilliseconds, elapsedMilliseconds );
 			_gate.Set();
@@ -65,7 +66,7 @@ namespace Simulation {
 
 				// Perform a simulation tick
 				if( elapsedMilliseconds > 0 ) {
-					var map = _mapProvider.Get();
+					Map map = _mapProvider.Get();
 					_actors.SimulationUpdate( map );
 				}
 

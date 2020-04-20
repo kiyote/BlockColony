@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Surface;
@@ -37,13 +37,14 @@ namespace Pathfinding.Tests {
 		public void TearDown() {
 			_manager.Stop();
 			_gate.WaitOne( DELAY_MS );
+			_gate.Dispose();
 		}
 
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new PathfindingManager();
-			var startCount = 0;
+			int startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
@@ -59,9 +60,9 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new PathfindingManager();
-			var startCount = 0;
+			int startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
@@ -79,9 +80,9 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new PathfindingManager();
-			var stopCount = 0;
+			int stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
 			};
@@ -100,9 +101,9 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new PathfindingManager();
-			var stopCount = 0;
+			int stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
 			};
@@ -131,7 +132,7 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void GetPath_ManagerNotStarted_ThrowsException() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var callback = new PathfindingCallback( gate );
 			var manager = new PathfindingManager();
 

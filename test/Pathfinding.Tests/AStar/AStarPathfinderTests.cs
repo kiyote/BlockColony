@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Surface;
 using NUnit.Framework;
 
@@ -31,9 +31,9 @@ namespace Pathfinding.AStar.Tests {
 			Locomotion locomotion
 		) {
 			Map map = new Map( 10, 10, _defaultInitializer );
-			ref var start = ref map.GetCell( startColumn, startRow );
-			ref var goal = ref map.GetCell( goalColumn, goalRow );
-			var path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
+			ref MapCell start = ref map.GetCell( startColumn, startRow );
+			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
+			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
 
 			CollectionAssert.IsNotEmpty( path );
 			Assert.AreEqual( 3, path.Count );
@@ -65,9 +65,9 @@ namespace Pathfinding.AStar.Tests {
 				map.GetCell( 9, row ).TerrainCost = 32000;
 			}
 
-			ref var start = ref map.GetCell( startColumn, startRow );
-			ref var goal = ref map.GetCell( goalColumn, goalRow );
-			var path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
+			ref MapCell start = ref map.GetCell( startColumn, startRow );
+			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
+			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
 
 			CollectionAssert.IsNotEmpty( path );
 			Assert.AreEqual( 7, path.Count );
@@ -89,9 +89,9 @@ namespace Pathfinding.AStar.Tests {
 			Locomotion locomotion
 		) {
 			Map map = new Map( 10, 10, _defaultInitializer );
-			ref var start = ref map.GetCell( startColumn, startRow );
-			ref var goal = ref map.GetCell( goalColumn, goalRow );
-			var path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
+			ref MapCell start = ref map.GetCell( startColumn, startRow );
+			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
+			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
 
 			CollectionAssert.IsNotEmpty( path );
 			Assert.AreEqual( 4, path.Count );

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using NUnit.Framework;
 using Pathfinding;
@@ -20,21 +20,19 @@ namespace Mob.Tests {
 			const int Rows = 3;
 			const int Columns = 3;
 			_map = new Map( Columns, Rows, new DefaultInitializer() );
+		}
 
+		[OneTimeTearDown]
+		public void OneTimeTearDown() {
+		}
+
+		[SetUp]
+		public void SetUp() {
 			_pathfindingManager = new PathfindingManager();
 			_pathfindingManager.Start();
 
 			_actorManager = new ActorManager( _pathfindingManager );
 			_jobManager = new JobManager( _actorManager, _pathfindingManager, this );
-		}
-
-		[OneTimeTearDown]
-		public void OneTimeTearDown() {
-			_pathfindingManager.Stop();
-		}
-
-		[SetUp]
-		public void SetUp() {
 			_jobManager.Start();
 
 			_actor = new Actor( 0, 0, Locomotion.Walk );
@@ -43,13 +41,15 @@ namespace Mob.Tests {
 
 		[TearDown]
 		public void TearDown() {
+			_actorManager.Remove( _actor );
 			_jobManager.Stop();
+			_pathfindingManager.Stop();
 		}
 
 #if DEBUG
 		[Test]
 		public void SimulationUpdate_HasJob_PicksUpJob() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			_actor.JobAssigned += ( _, __ ) => {
 				gate.Set();
 			};
@@ -72,7 +72,7 @@ namespace Mob.Tests {
 
 		[Test]
 		public void RouteStepComplete_WalkingPath_DigWhenDone() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			_actor.JobAssigned += ( _, __ ) => {
 				gate.Set();
 			};

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Surface;
 using System.Threading;
 using System.Collections.Concurrent;
 using Pathfinding;
+using System.Diagnostics;
 
 namespace Work {
 	public class JobManager : IPathfindingCallback {
@@ -83,10 +84,10 @@ namespace Work {
 
 				Job job = GetNextJob();
 				while( job != default( Job ) ) {
-					var map = _mapProvider.Get();
+					Map map = _mapProvider.Get();
 
 					// All the people available to handle the job
-					var fits = _jobFitProvider.GetAvailable();
+					IJobFit[] fits = _jobFitProvider.GetAvailable();
 					// Of those, the people who could possibly handle the job
 					// (ie - has the right skill)
 					fits = FilterSuitable( job, fits );
@@ -99,7 +100,7 @@ namespace Work {
 					}
 
 					// Now we calculate the distance to the job for everyone
-					// left, blocking until the pathing is complete
+					// left, eventually blocking until the pathing is complete.
 					StartPathing( map, job, fits );
 					// Non-path fitness is "suitability" for the job.  ie - Those 
 					// with higher skills are more fit than those with lower skills.
@@ -127,7 +128,7 @@ namespace Work {
 						ClearFoundRoutes();
 						job = GetNextJob();
 					} else {
-						job = default( Job );
+						job = default;
 					}
 				}
 
@@ -165,6 +166,10 @@ namespace Work {
 		}
 
 		private bool PathingComplete() {
+#if DEBUG
+			Debug.WriteLine( "JobManager::PathingComplete" );
+#endif
+
 			for( int i = 0; i < _pendingRoutes; i++ ) {
 				if( _foundRoutes[ i ] == default( Route ) ) {
 					return false;
@@ -183,7 +188,7 @@ namespace Work {
 
 		private void ClearFoundRoutes() {
 			for( int i = 0; i < _pendingRoutes; i++ ) {
-				_foundRoutes[ i ] = default( Route );
+				_foundRoutes[ i ] = default;
 				_fitness[ i ] = 0;
 			}
 		}
@@ -193,7 +198,7 @@ namespace Work {
 				_jobs[ newJob.Priority ].Add( newJob );
 			}
 
-			Job result = default( Job );
+			Job result = default;
 			for( int i = 0; i < Job.PriorityCount; i++ ) {
 				if( _jobs[ i ].Count > 0 ) {
 					result = _jobs[ i ][ 0 ];
@@ -205,6 +210,9 @@ namespace Work {
 		}
 
 		private void StartPathing( Map map, Job job, IJobFit[] fits ) {
+#if DEBUG
+			Debug.WriteLine( "JobManager:StartPathing" );
+#endif
 
 			if( fits.Length > _foundRoutes.Length ) {
 				_foundRoutes = new Route[ fits.Length ];
@@ -213,16 +221,19 @@ namespace Work {
 			_pendingRoutes = fits.Length;
 
 			for( int i = 0; i < fits.Length; i++ ) {
-				var fit = fits[ i ];
-				var activity = job.Activity[ 0 ];
-				var step = activity.Step[ 0 ];
-				ref var location = ref map.GetCell( fit.LocationColumn, fit.LocationRow );
-				ref var target = ref map.GetCell( step.Column, step.Row );
+				IJobFit fit = fits[ i ];
+				Activity activity = job.Activity[ 0 ];
+				Step step = activity.Step[ 0 ];
+				ref MapCell location = ref map.GetCell( fit.LocationColumn, fit.LocationRow );
+				ref MapCell target = ref map.GetCell( step.Column, step.Row );
 				_pathfindingManager.GetPath( map, ref location, ref target, fit.Locomotion, this, i );
 			}
 		}
 
 		void IPathfindingCallback.PathFound( Route route, int context ) {
+#if DEBUG
+			Debug.WriteLine( "JobManager::IPathfindingCallback.PathFound" );
+#endif
 			Interlocked.Exchange( ref _foundRoutes[ context ], route );
 			_gate.Set();
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
@@ -10,7 +10,7 @@ namespace Surface.Tests {
 		[Test]
 		public void Load_ValidTerrainFile_TerrainLoaded() {
 			var manager = new TerrainManager();
-			using( var reader = GetText( "valid.terrain.json" ) ) {
+			using( StreamReader reader = GetText( "valid.terrain.json" ) ) {
 				manager.Load( reader );
 			}
 
@@ -20,7 +20,7 @@ namespace Surface.Tests {
 
 		private StreamReader GetText( string name ) {
 			var assembly = Assembly.GetExecutingAssembly();
-			var resourceStream = assembly.GetManifestResourceStream( "Surface.Tests." + name );
+			Stream resourceStream = assembly.GetManifestResourceStream( "Surface." + name );
 			return new StreamReader( resourceStream, Encoding.UTF8 );
 		}
 	}

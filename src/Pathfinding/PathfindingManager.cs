@@ -1,16 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using Surface;
 using Pathfinding.AStar;
+using System.Diagnostics;
 
 namespace Pathfinding {
 	public class PathfindingManager {
 		private Thread _thread;
-		private AutoResetEvent _gate;
+		private readonly AutoResetEvent _gate;
 		private bool _terminated;
-		private ConcurrentQueue<PathRequest> _requests;
-		private IPathfinder _pathfinder;
+		private readonly ConcurrentQueue<PathRequest> _requests;
+		private readonly IPathfinder _pathfinder;
 
 		private class PathRequest {
 			public Map Map;
@@ -92,7 +93,10 @@ namespace Pathfinding {
 						break;
 					}
 					if( _requests.TryDequeue( out PathRequest request ) ) {
-						var path = _pathfinder.GetPath(
+#if DEBUG
+						Debug.WriteLine( "PathfindingManager::Run: Request Found" );
+#endif
+						Route path = _pathfinder.GetPath(
 							request.Map,
 							ref request.Map.GetCell( request.StartColumn, request.StartRow ),
 							ref request.Map.GetCell( request.GoalColumn, request.GoalRow ),

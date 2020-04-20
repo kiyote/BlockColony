@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Surface;
 
@@ -6,8 +6,6 @@ namespace MapGenerator {
 	internal class Generator : IMapGenerator {
 		private TerrainManager _terrainManager;
 		private MapGeneratorOptions _options;
-		private short _rows;
-		private short _columns;
 		private Random _random;
 
 		private Map _map;
@@ -38,12 +36,11 @@ namespace MapGenerator {
 			_random = new Random();
 			_terrainManager = terrainManager;
 			_options = options;
-			_rows = options.Rows;
-			_columns = options.Columns;
 
-			_map = default( Map );
-			Thread thread = new Thread( Run );
-			thread.Name = "Map Generator Thread";
+			_map = default;
+			Thread thread = new Thread( Run ) {
+				Name = "Map Generator Thread"
+			};
 			thread.Start();
 			// Thread will terminate when the Run completes which is the
 			// completion of the map generation and the population of _map.
@@ -57,7 +54,7 @@ namespace MapGenerator {
 					_terrainManager,
 					_options ) );
 
-			var layerWidth = map.Columns / 4;
+			int layerWidth = map.Columns / 4;
 			// Applying layers from far-right to far-left order, otherwise
 			// the function wouldn't know when to stop applying its terrain
 			ApplyTerrainLayer( _terrainManager, map, _options.Terrain.Far, layerWidth * 3, map.Columns );
@@ -76,8 +73,8 @@ namespace MapGenerator {
 
 		private class CellInitializer : IMapMethod {
 
-			private TerrainManager _terrainManager;
-			private MapGeneratorOptions _options;
+			private readonly TerrainManager _terrainManager;
+			private readonly MapGeneratorOptions _options;
 
 			public CellInitializer(
 				TerrainManager terrainManager,
@@ -90,7 +87,7 @@ namespace MapGenerator {
 			void IMapMethod.Do( ref MapCell cell ) {
 				cell.NewTemperature = (byte)_options.AmbientTemperature;
 
-				var terrain = _terrainManager?[ 3 ];  // Magically know this is soil!
+				ITerrain terrain = _terrainManager?[ 3 ];  // Magically know this is soil!
 				cell.NewTerrainId = 0;
 				cell.NewMoisture = 0;
 				cell.TerrainCost = (short)terrain[ _options.AmbientTemperature ].PathingCost;
@@ -104,14 +101,14 @@ namespace MapGenerator {
 			Map map,
 			LayerTerrainOptions terrainOptions
 		) {
-			var terrain = terrainManager.GetByIdName( terrainOptions.IdName );
+			ITerrain terrain = terrainManager.GetByIdName( terrainOptions.IdName );
 			for( int row = 0; row < map.Rows; row++ ) {
 
-				var counter = 0;
-				bool terrainUpdated = false;
+				int counter = 0;
+				bool terrainUpdated;
 				do {
 					terrainUpdated = false;
-					ref var cell = ref map.GetCell( counter, row );
+					ref MapCell cell = ref map.GetCell( counter, row );
 					while( cell.TerrainId == 0 ) {
 						cell.TerrainId = terrain.Id;
 						counter++;
@@ -129,14 +126,14 @@ namespace MapGenerator {
 			int startColumn,
 			int endColumn
 		) {
-			var terrain = terrainManager.GetByIdName( terrainOptions.IdName );
+			ITerrain terrain = terrainManager.GetByIdName( terrainOptions.IdName );
 			for( int row = 0; row < map.Rows; row++ ) {
 				// Drunken-walk down the map.  The farther you are from your
 				// 'ideal' location the more correction is applied to drag
 				// you closer to the ideal.
-				var currentColumn = startColumn;
-				var delta = startColumn - currentColumn;
-				var direction = _random.Next( 10 ) + delta;
+				int currentColumn = startColumn;
+				int delta = startColumn - currentColumn;
+				int direction = _random.Next( 10 ) + delta;
 				if( direction < 4 ) {
 					currentColumn -= 1;
 				} else if( direction >= 6 ) {
@@ -144,7 +141,7 @@ namespace MapGenerator {
 				}
 
 				while( currentColumn < endColumn ) {
-					ref var cell = ref map.GetCell( currentColumn, row );
+					ref MapCell cell = ref map.GetCell( currentColumn, row );
 					// Ensures that the cell hasn't already been initialized by
 					// something other layer.
 					if( cell.TerrainId == 0 ) {
@@ -156,31 +153,31 @@ namespace MapGenerator {
 		}
 
 		private void ApplyEasyRiver( TerrainManager terrainManager, Map map, RiverTerrainOptions riverOptions ) {
-			var startColumn = map.Columns / 3;
-			var startDrift = map.Columns / 10;
+			int startColumn = map.Columns / 3;
+			int startDrift = map.Columns / 10;
 
 			// The river falls one third of the way across the map, within a 
 			// margin of +/- 10% of the width of the map
 			startColumn += ( _random.Next( startDrift / 2 ) + ( startDrift / 2 ) );
-			var currentColumn = startColumn;
+			int currentColumn = startColumn;
 
 			// Controls the length of a step in the drunken-walk.  This is the
 			// minimum number of rows we go in a straight line before finding
 			// a new column to occupy.
-			var runLength = _random.Next( 3 ) + 2;
+			int runLength = _random.Next( 3 ) + 2;
 
-			var terrain = terrainManager.GetByIdName( riverOptions.Easy );
+			ITerrain terrain = terrainManager.GetByIdName( riverOptions.Easy );
 			for( int row = 0; row < map.Rows; row++ ) {
 				for( int width = -1; width <= 1; width++ ) {
-					ref var cell = ref map.GetCell( currentColumn + width, row );
+					ref MapCell cell = ref map.GetCell( currentColumn + width, row );
 					cell.TerrainId = terrain.Id;
 				}
 				runLength -= 1;
 
 				if( runLength == 0 ) {
 					runLength = _random.Next( 3 ) + 3;
-					var delta = startColumn - currentColumn;
-					var direction = _random.Next( 10 ) + delta;
+					int delta = startColumn - currentColumn;
+					int direction = _random.Next( 10 ) + delta;
 					if( direction < 3 ) {
 						currentColumn -= 1;
 					} else if( direction >= 7 ) {

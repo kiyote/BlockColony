@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -110,8 +110,9 @@ namespace Pathfinding.FastPriorityQueue {
 			if( node.QueueIndex > 1 ) {
 				parent = node.QueueIndex >> 1;
 				T parentNode = _nodes[parent];
-				if( HasHigherOrEqualPriority( parentNode, node ) )
+				if( HasHigherOrEqualPriority( parentNode, node ) ) {
 					return;
+				}
 
 				//Node has lower priority value, so move parent down the heap to make room
 				_nodes[node.QueueIndex] = parentNode;
@@ -124,8 +125,9 @@ namespace Pathfinding.FastPriorityQueue {
 			while( parent > 1 ) {
 				parent >>= 1;
 				T parentNode = _nodes[parent];
-				if( HasHigherOrEqualPriority( parentNode, node ) )
+				if( HasHigherOrEqualPriority( parentNode, node ) ) {
 					break;
+				}
 
 				//Node has lower priority value, so move parent down the heap to make room
 				_nodes[node.QueueIndex] = parentNode;

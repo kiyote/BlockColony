@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Pathfinding;
 using Surface;
@@ -25,6 +25,11 @@ namespace Mob {
 			_idle.Add( actor );
 		}
 
+		public void Remove( Actor actor ) {
+			_actors.Remove( actor );
+			_idle.Remove( actor );
+		}
+
 		public List<Actor> GetIdleActors() {
 			return _idle;
 		}
@@ -35,14 +40,13 @@ namespace Mob {
 
 		// Called from the simulation thread
 		public void SimulationUpdate( Map map ) {
-			foreach( var actor in _actors ) {
+			foreach( Actor actor in _actors ) {
 				actor.SimulationUpdate();
 
 				if( actor.Errand == Errand.WaitingToPath ) {
-					var step = actor.GetActivityStep();
-					ref var target = ref map.GetCell( step.Column, step.Row );
-					ref var source = ref map.GetCell( actor.Column, actor.Row );
-					actor.ErrandComplete();
+					Step step = actor.GetActivityStep();
+					ref MapCell target = ref map.GetCell( step.Column, step.Row );
+					ref MapCell source = ref map.GetCell( actor.Column, actor.Row );
 					_pathfindingManager.GetPath( map, ref source, ref target, actor.Locomotion, actor, Actor.MoveContext );
 				}
 			}
@@ -50,7 +54,7 @@ namespace Mob {
 
 		private void MoveActor( Map map, Actor actor, MapCell goal ) {
 			MakeBusy( actor );
-			ref var source = ref map.GetCell( actor.Column, actor.Row );
+			ref MapCell source = ref map.GetCell( actor.Column, actor.Row );
 			_pathfindingManager.GetPath( map, ref source, ref goal, actor.Locomotion, actor, Actor.MoveContext );
 		}
 

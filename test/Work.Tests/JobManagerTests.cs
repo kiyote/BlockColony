@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using NUnit.Framework;
 using Pathfinding;
 using Surface;
@@ -45,9 +45,9 @@ namespace Work.Tests {
 
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new JobManager( this, _pathfindingManager, this );
-			var startCount = 0;
+			int startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
@@ -63,9 +63,9 @@ namespace Work.Tests {
 
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new JobManager( this, _pathfindingManager, this );
-			var startCount = 0;
+			int startCount = 0;
 			manager.Started += ( _, __ ) => {
 				startCount += 1;
 				gate.Set();
@@ -83,9 +83,9 @@ namespace Work.Tests {
 
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new JobManager( this, _pathfindingManager, this );
-			var stopCount = 0;
+			int stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
 			};
@@ -104,9 +104,9 @@ namespace Work.Tests {
 
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
-			var gate = new AutoResetEvent( false );
+			using var gate = new AutoResetEvent( false );
 			var manager = new JobManager( this, _pathfindingManager, this );
-			var stopCount = 0;
+			int stopCount = 0;
 			manager.Started += ( _, __ ) => {
 				gate.Set();
 			};
@@ -153,9 +153,10 @@ namespace Work.Tests {
 			var gate = new AutoResetEvent( false );
 
 			var fit1 = new TestJobFit( gate );
-			var fit2 = new TestJobFit( gate );
-			fit2.LocationColumn = _map.HalfColumns - 1;
-			fit2.LocationRow = _map.HalfRows - 1;
+			var fit2 = new TestJobFit( gate ) {
+				LocationColumn = _map.HalfColumns - 1,
+				LocationRow = _map.HalfRows - 1
+			};
 			_fits = new IJobFit[ 2 ] {
 				fit1,
 				fit2
@@ -193,7 +194,7 @@ namespace Work.Tests {
 
 		private class TestJobFit : IJobFit {
 
-			private AutoResetEvent _gate;
+			private readonly AutoResetEvent _gate;
 
 			public TestJobFit(AutoResetEvent gate) {
 				_gate = gate;

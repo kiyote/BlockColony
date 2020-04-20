@@ -32,8 +32,8 @@ namespace Surface.Tests {
 			short expectedColumn,
 			short expectedRow
 		) {
-			var source = _map.GetCell( column, row );
-			var actual = _map.GetNeighbour( ref source, direction );
+			MapCell source = _map.GetCell( column, row );
+			MapCell actual = _map.GetNeighbour( ref source, direction );
 			Assert.AreEqual( expectedColumn, actual.Column );
 			Assert.AreEqual( expectedRow, actual.Row );
 		}

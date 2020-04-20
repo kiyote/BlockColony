@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Work {
 	public class Step : IEquatable<Step> {
@@ -20,7 +20,7 @@ namespace Work {
 		public int Row { get; }
 
 		public bool Equals( Step other ) {
-			if( ReferenceEquals( other, null ) ) {
+			if( other is null ) {
 				return false;
 			}
 
