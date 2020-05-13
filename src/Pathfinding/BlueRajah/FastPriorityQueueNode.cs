@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System;
 
-namespace Pathfinding.FastPriorityQueue
-{
-	public class FastPriorityQueueNode {
+namespace Pathfinding.BlueRajah {
+
+	internal class FastPriorityQueueNode {
 		/// <summary>
 		/// The Priority to insert this node at.  Must be set BEFORE adding a node to the queue (ideally just once, in the node's constructor).
 		/// Should not be manually edited once the node has been enqueued - use queue.UpdatePriority() instead

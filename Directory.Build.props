@@ -1,0 +1,25 @@
+<Project>
+	<PropertyGroup>
+		<LangVersion>7.3</LangVersion>
+	</PropertyGroup>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>	
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|AnyCPU'">
+    <DefineConstants>TEST;TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="DynamicDependentFile" />
+    <ProjectCapability Include="DynamicFileNesting" />
+  </ItemGroup>
+  <PropertyGroup>
+    <SkipDefaultEditorConfigAsAdditionalFile>true</SkipDefaultEditorConfigAsAdditionalFile>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(SolutionDir)\.editorconfig')" >
+      <AdditionalFiles Include="$(SolutionDir)\.editorconfig" />  
+  </ItemGroup>
+</Project>

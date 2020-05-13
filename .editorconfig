@@ -104,3 +104,6 @@ csharp_space_between_method_call_empty_parameter_list_parentheses        = false
 
 csharp_preserve_single_line_statements                                   = true                                 # default
 csharp_preserve_single_line_blocks                                       = true                                 # default
+
+#Code Quality Rules
+dotnet_code_quality.excluded_type_names_with_derived_types				= System.Exception

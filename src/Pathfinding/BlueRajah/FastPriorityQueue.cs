@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Pathfinding.FastPriorityQueue {
+namespace Pathfinding.BlueRajah {
 	/// <summary>
 	/// An implementation of a min-Priority Queue using a heap.  Has O(1) .Contains()!
 	/// See https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp/wiki/Getting-Started for more information
 	/// </summary>
 	/// <typeparam name="T">The values in the queue.  Must extend the FastPriorityQueueNode class</typeparam>
-	public sealed class FastPriorityQueue<T> : IFixedSizePriorityQueue<T, int>
+	internal sealed class FastPriorityQueue<T> : IFixedSizePriorityQueue<T, int>
 		where T : FastPriorityQueueNode {
 		private int _numNodes;
 		private T[] _nodes;
@@ -53,7 +53,7 @@ namespace Pathfinding.FastPriorityQueue {
 		/// Removes every node from the queue.
 		/// O(n) (So, don't do this often!)
 		/// </summary>
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Clear() {
 			Array.Clear( _nodes, 1, _numNodes );
 			_numNodes = 0;
@@ -62,11 +62,11 @@ namespace Pathfinding.FastPriorityQueue {
 		/// <summary>
 		/// Returns (in O(1)!) whether the given node is in the queue.  O(1)
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public bool Contains( T node ) {
 #if DEBUG
 			if( node == null ) {
-				throw new ArgumentNullException( "node" );
+				throw new ArgumentNullException( nameof( node ) );
 			}
 			if( node.QueueIndex < 0 || node.QueueIndex >= _nodes.Length ) {
 				throw new InvalidOperationException( "node.QueueIndex has been corrupted. Did you change it manually? Or add this node to another queue?" );
@@ -82,11 +82,11 @@ namespace Pathfinding.FastPriorityQueue {
 		/// If the node is already enqueued, the result is undefined.
 		/// O(log n)
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public void Enqueue( T node, int priority ) {
 #if DEBUG
 			if( node == null ) {
-				throw new ArgumentNullException( "node" );
+				throw new ArgumentNullException( nameof( node ) );
 			}
 			if( _numNodes >= _nodes.Length - 1 ) {
 				throw new InvalidOperationException( "Queue is full - node cannot be added: " + node );
@@ -103,7 +103,7 @@ namespace Pathfinding.FastPriorityQueue {
 			CascadeUp( node );
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		private void CascadeUp( T node ) {
 			//aka Heapify-up
 			int parent;
@@ -138,7 +138,7 @@ namespace Pathfinding.FastPriorityQueue {
 			_nodes[node.QueueIndex] = node;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		private void CascadeDown( T node ) {
 			//aka Heapify-down
 			int finalQueueIndex = node.QueueIndex;
@@ -255,8 +255,8 @@ namespace Pathfinding.FastPriorityQueue {
 		/// Returns true if 'higher' has higher priority than 'lower', false otherwise.
 		/// Note that calling HasHigherPriority(node, node) (ie. both arguments the same node) will return false
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool HasHigherPriority( T higher, T lower ) {
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		private static bool HasHigherPriority( T higher, T lower ) {
 			return ( higher.Priority < lower.Priority );
 		}
 
@@ -264,8 +264,8 @@ namespace Pathfinding.FastPriorityQueue {
 		/// Returns true if 'higher' has higher priority than 'lower', false otherwise.
 		/// Note that calling HasHigherOrEqualPriority(node, node) (ie. both arguments the same node) will return true
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool HasHigherOrEqualPriority( T higher, T lower ) {
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		private static bool HasHigherOrEqualPriority( T higher, T lower ) {
 			return ( higher.Priority <= lower.Priority );
 		}
 
@@ -274,17 +274,19 @@ namespace Pathfinding.FastPriorityQueue {
 		/// If queue is empty, result is undefined
 		/// O(log n)
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public T Dequeue() {
 #if DEBUG
 			if( _numNodes <= 0 ) {
 				throw new InvalidOperationException( "Cannot call Dequeue() on an empty queue" );
 			}
 
+#if VALIDATE_QUEUE
 			if( !IsValidQueue() ) {
 				throw new InvalidOperationException( "Queue has been corrupted (Did you update a node priority manually instead of calling UpdatePriority()?" +
 													"Or add the same node to two different queues?)" );
 			}
+#endif
 #endif
 
 			T returnMe = _nodes[1];
@@ -352,11 +354,11 @@ namespace Pathfinding.FastPriorityQueue {
 		/// Calling this method on a node not in the queue results in undefined behavior
 		/// O(log n)
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public void UpdatePriority( T node, int priority ) {
 #if DEBUG
 			if( node == null ) {
-				throw new ArgumentNullException( "node" );
+				throw new ArgumentNullException( nameof( node ) );
 			}
 			if( !Contains( node ) ) {
 				throw new InvalidOperationException( "Cannot call UpdatePriority() on a node which is not enqueued: " + node );
@@ -367,7 +369,7 @@ namespace Pathfinding.FastPriorityQueue {
 			OnNodeUpdated( node );
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		private void OnNodeUpdated( T node ) {
 			//Bubble the updated node up or down as appropriate
 			int parentIndex = node.QueueIndex >> 1;
@@ -385,11 +387,11 @@ namespace Pathfinding.FastPriorityQueue {
 		/// If the node is not in the queue, the result is undefined.  If unsure, check Contains() first
 		/// O(log n)
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public void Remove( T node ) {
 #if DEBUG
 			if( node == null ) {
-				throw new ArgumentNullException( "node" );
+				throw new ArgumentNullException( nameof( node ) );
 			}
 			if( !Contains( node ) ) {
 				throw new InvalidOperationException( "Cannot call Remove() on a node which is not enqueued: " + node );
@@ -415,20 +417,20 @@ namespace Pathfinding.FastPriorityQueue {
 		}
 
 		public IEnumerator<T> GetEnumerator() {
-			IEnumerable<T> e = new ArraySegment<T>(_nodes, 1, _numNodes);
-            return e.GetEnumerator();
+			IEnumerable<T> e = new ArraySegment<T>( _nodes, 1, _numNodes );
+			return e.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
 			return GetEnumerator();
 		}
 
+#if VALIDATE_QUEUE
 		/// <summary>
 		/// <b>Should not be called in production code.</b>
 		/// Checks to make sure the queue is still in a valid state.  Used for testing/debugging the queue.
 		/// </summary>
 		public bool IsValidQueue() {
-#if VALIDATE_QUEUE
 			for( int i = 1; i < _nodes.Length; i++ ) {
 				if( _nodes[i] != null ) {
 					int childLeftIndex = 2 * i;
@@ -440,8 +442,8 @@ namespace Pathfinding.FastPriorityQueue {
 						return false;
 				}
 			}
-#endif
 			return true;
 		}
+#endif
 	}
 }

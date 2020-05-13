@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.ColorSpaces.Conversion;
 
 namespace MapGenerator.Tests {
 
@@ -27,13 +28,14 @@ namespace MapGenerator.Tests {
 			}
 
 			int eventCount = 0;
-			using var gate = new AutoResetEvent( false );
-			generator.MapGenerationCompleted += ( _, __ ) => {
-				eventCount++;
-				gate.Set();
-			};
-			generator.Build( manager, options );
-			gate.WaitOne( 10000 );
+			using( var gate = new AutoResetEvent( false ) ) {
+				generator.MapGenerationCompleted += ( _, __ ) => {
+					eventCount++;
+					gate.Set();
+				};
+				generator.Build( manager, options );
+				gate.WaitOne( 10000 );
+			}
 
 			Assert.AreEqual( 1, eventCount );
 			Assert.IsNotNull( generator.Map );
@@ -48,25 +50,38 @@ namespace MapGenerator.Tests {
 		}
 
 		private void WriteMapToImage( Map map ) {
-			using Image<Rgba32> image = new Image<Rgba32>( map.Columns, map.Rows );
-			for( int column = 0; column < map.Columns; column++ ) {
-				for( int row = 0; row < map.Rows; row++ ) {
-					ref MapCell cell = ref map.GetCell( column, row );
-					Rgba32 color = Rgba32.White;
-					color = cell.TerrainId switch
-					{
-						1 => Rgba32.Blue,
-						3 => Rgba32.LawnGreen,
-						4 => Rgba32.SandyBrown,
-						5 => Rgba32.LightSlateGray,
-						6 => Rgba32.SlateGray,
-						_ => Rgba32.White,
-					};
-					image[column, row] = color;
+			using( Image<Rgba32> image = new Image<Rgba32>( map.Columns, map.Rows ) ) {
+				for( int column = 0; column < map.Columns; column++ ) {
+					for( int row = 0; row < map.Rows; row++ ) {
+						ref MapCell cell = ref map.GetCell( column, row );
+						Rgba32 color = Color.White;
+						switch (cell.TerrainId) {
+							case 1:
+								color = Color.Blue;
+								break;
+							case 2:
+								color = Color.LawnGreen;
+								break;
+							case 4:
+								color = Color.SandyBrown;
+								break;
+							case 5:
+								color = Color.LightSlateGray;
+								break;
+							case 6:
+								color = Color.SlateGray;
+								break;
+							default:
+								color = Color.White;
+								break;
+						}
+						image[column, row] = color;
+					}
+				}
+				using( var writer = new FileStream( @"C:\temp\image.png", FileMode.Create ) ) {
+					image.SaveAsPng( writer );
 				}
 			}
-			using var writer = new FileStream( @"C:\temp\image.png", FileMode.Create );
-			image.SaveAsPng( writer );
 		}
 	}
 }

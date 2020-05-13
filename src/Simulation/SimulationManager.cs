@@ -2,10 +2,9 @@ using System;
 using System.Threading;
 using Mob;
 using Surface;
-using Work;
 
 namespace Simulation {
-	public class SimulationManager {
+	public sealed class SimulationManager: IDisposable {
 		private Thread _thread;
 		private readonly AutoResetEvent _gate;
 		private bool _terminated;
@@ -66,7 +65,7 @@ namespace Simulation {
 
 				// Perform a simulation tick
 				if( elapsedMilliseconds > 0 ) {
-					Map map = _mapProvider.Get();
+					Map map = _mapProvider.Current();
 					_actors.SimulationUpdate( map );
 				}
 
@@ -76,6 +75,10 @@ namespace Simulation {
 #if DEBUG
 			Stopped?.Invoke( this, EventArgs.Empty );
 #endif
+		}
+
+		public void Dispose() {
+			_gate?.Dispose();
 		}
 	}
 }

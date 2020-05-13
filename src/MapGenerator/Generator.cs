@@ -3,7 +3,7 @@ using System.Threading;
 using Surface;
 
 namespace MapGenerator {
-	internal class Generator : IMapGenerator {
+	internal sealed class Generator : IMapGenerator {
 		private TerrainManager _terrainManager;
 		private MapGeneratorOptions _options;
 		private Random _random;
@@ -84,7 +84,7 @@ namespace MapGenerator {
 				_options = options;
 			}
 
-			void IMapMethod.Do( ref MapCell cell ) {
+			void IMapMethod.Invoke( ref MapCell cell ) {
 				cell.NewTemperature = (byte)_options.AmbientTemperature;
 
 				ITerrain terrain = _terrainManager?[ 3 ];  // Magically know this is soil!
@@ -96,7 +96,7 @@ namespace MapGenerator {
 
 		// Walks the left-edge of the map filling in to the right where a
 		// terrain hasn't otherwise been specified.
-		private void FillOutsideEdge(
+		private static void FillOutsideEdge(
 			TerrainManager terrainManager,
 			Map map,
 			LayerTerrainOptions terrainOptions

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Surface {
 
 	public class TerrainManager {
-		private Dictionary<int, Terrain> _terrain;
+		private readonly Dictionary<int, Terrain> _terrain;
 
 		public TerrainManager() {
 			_terrain = new Dictionary<int, Terrain>();
@@ -24,10 +24,14 @@ namespace Surface {
 		}
 
 		public void Load( TextReader stream ) {
-			var terrainConfig = JsonConvert.DeserializeObject<TerrainFile>( stream.ReadToEnd() );
+			if (stream == default) {
+				throw new ArgumentNullException( nameof( stream ) );
+			}
 
-			foreach( var entry in terrainConfig.Terrain ) {
-				var phase = terrainConfig.Phase.Where( p => string.Compare( p.Name, entry.Phase, true ) == 0 ).First();
+			TerrainFile terrainConfig = JsonConvert.DeserializeObject<TerrainFile>( stream.ReadToEnd() );
+
+			foreach( TerrainFile.TerrainConfig entry in terrainConfig.Terrain ) {
+				TerrainFile.PhaseConfig phase = terrainConfig.Phase.Where( p => string.Equals( p.Name, entry.Phase, StringComparison.OrdinalIgnoreCase ) ).First();
 				var terrain = new Terrain( entry.Id, entry.IdName, phase.Phases.Select( p => {
 					return (transition: p.Transition, attribute: p as ITerrainAttributes);
 				} ) );

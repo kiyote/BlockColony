@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 
 namespace Surface {
 	public interface IMapMethod {
-		void Do( ref MapCell cell );
+		void Invoke( ref MapCell cell );
 	}
 }

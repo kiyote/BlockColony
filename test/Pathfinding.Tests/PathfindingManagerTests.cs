@@ -42,84 +42,89 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
-			using var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
-			int startCount = 0;
-			manager.Started += ( _, __ ) => {
-				startCount += 1;
-				gate.Set();
-			};
+			using( var gate = new AutoResetEvent( false ) ) {
+				var manager = new PathfindingManager();
+				int startCount = 0;
+				manager.Started += ( _, __ ) => {
+					startCount += 1;
+					gate.Set();
+				};
 
-			manager.Start();
+				manager.Start();
 
-			gate.WaitOne( DELAY_MS );
-			manager.Stop();
+				gate.WaitOne( DELAY_MS );
+				manager.Stop();
 
-			Assert.That( startCount, Is.EqualTo( 1 ) );
+				Assert.That( startCount, Is.EqualTo( 1 ) );
+			}
 		}
 
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
-			using var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
-			int startCount = 0;
-			manager.Started += ( _, __ ) => {
-				startCount += 1;
-				gate.Set();
-			};
-			manager.Start();
-			gate.WaitOne( DELAY_MS );
+			using( var gate = new AutoResetEvent( false ) ) {
+				var manager = new PathfindingManager();
+				int startCount = 0;
+				manager.Started += ( _, __ ) => {
+					startCount += 1;
+					gate.Set();
+				};
+				manager.Start();
+				gate.WaitOne( DELAY_MS );
 
-			manager.Start();
-			gate.WaitOne( DELAY_MS );
+				manager.Start();
+				gate.WaitOne( DELAY_MS );
 
-			manager.Stop();
+				manager.Stop();
 
-			Assert.That( startCount, Is.EqualTo( 1 ) );
+				Assert.That( startCount, Is.EqualTo( 1 ) );
+			}
 		}
 
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
-			using var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
-			int stopCount = 0;
-			manager.Started += ( _, __ ) => {
-				gate.Set();
-			};
-			manager.Stopped += ( _, __ ) => {
-				stopCount += 1;
-				gate.Set();
-			};
-			manager.Start();
-			gate.WaitOne( DELAY_MS );
+			using( var gate = new AutoResetEvent( false ) ) {
+				var manager = new PathfindingManager();
+				int stopCount = 0;
+				manager.Started += ( _, __ ) => {
+					gate.Set();
+				};
+				manager.Stopped += ( _, __ ) => {
+					stopCount += 1;
+					gate.Set();
+				};
+				manager.Start();
+				gate.WaitOne( DELAY_MS );
 
-			manager.Stop();
-			gate.WaitOne( DELAY_MS );
+				manager.Stop();
+				gate.WaitOne( DELAY_MS );
 
-			Assert.That( stopCount, Is.EqualTo( 1 ) );
+				Assert.That( stopCount, Is.EqualTo( 1 ) );
+			}
 		}
 
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
-			using var gate = new AutoResetEvent( false );
-			var manager = new PathfindingManager();
-			int stopCount = 0;
-			manager.Started += ( _, __ ) => {
-				gate.Set();
-			};
-			manager.Stopped += ( _, __ ) => {
-				stopCount += 1;
-				gate.Set();
-			};
-			manager.Start();
-			gate.WaitOne( DELAY_MS );
-			manager.Stop();
-			gate.WaitOne( DELAY_MS );
+			using( var gate = new AutoResetEvent( false ) ) {
+				var manager = new PathfindingManager();
+				int stopCount = 0;
+				manager.Started += ( _, __ ) => {
+					gate.Set();
+				};
+				manager.Stopped += ( _, __ ) => {
+					stopCount += 1;
+					gate.Set();
+				};
+				manager.Start();
+				gate.WaitOne( DELAY_MS );
+				manager.Stop();
+				gate.WaitOne( DELAY_MS );
 
-			manager.Stop();
-			gate.WaitOne( DELAY_MS );
+				manager.Stop();
+				gate.WaitOne( DELAY_MS );
 
-			Assert.That( stopCount, Is.EqualTo( 1 ) );
+				Assert.That( stopCount, Is.EqualTo( 1 ) );
+
+			}
 		}
 
 		[Test]
@@ -132,23 +137,24 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void GetPath_ManagerNotStarted_ThrowsException() {
-			using var gate = new AutoResetEvent( false );
-			var callback = new PathfindingCallback( gate );
-			var manager = new PathfindingManager();
+			using( var gate = new AutoResetEvent( false ) ) {
+				var callback = new PathfindingCallback( gate );
+				var manager = new PathfindingManager();
 
-			try {
-				Assert.That( () => {
-					manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback, 0 );
-				}, Throws.InvalidOperationException );
-			} finally {
-				manager.Stop();
+				try {
+					Assert.That( () => {
+						manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback, 0 );
+					}, Throws.InvalidOperationException );
+				} finally {
+					manager.Stop();
+				}
 			}
 		}
 
 		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Do( ref MapCell cell ) {
+			void IMapMethod.Invoke( ref MapCell cell ) {
 				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Direction.All;
+				cell.Walkability = (byte)Directions.All;
 			}
 		}
 

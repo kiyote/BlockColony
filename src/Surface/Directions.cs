@@ -1,11 +1,15 @@
-﻿using System;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Surface {
 	[JsonConverter( typeof( StringEnumConverter ) )]
 	[Flags]
-	public enum Direction : byte {
+	[SuppressMessage(
+		"Design", "CA1028:Enum Storage should be Int32",
+		Justification = "Minimized size, plus there aren't more than 8 directions." )]
+	public enum Directions : byte {
 
 		North = 0b0001,
 

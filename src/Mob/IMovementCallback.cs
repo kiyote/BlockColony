@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 
 namespace Mob {
 
-	public class MovementEventArgs : EventArgs {
-		public int Column;
-		public int Row;
-		public int Milliseconds;
-		public IMovementCallback callback;
+	public sealed class MovementEventArgs : EventArgs {
+		public int Column { get; set; }
+		public int Row { get; set; }
+		public int Milliseconds { get; set; }
+		public IMovementCallback Callback { get; set; }
 	}
 
 	public interface IMovementCallback {

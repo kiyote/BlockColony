@@ -5,7 +5,7 @@ using Surface;
 using Work;
 
 namespace Mob {
-	public class Actor : IPathfindingCallback, IJobFit {
+	public sealed class Actor : IPathfindingCallback, IJobFit {
 		private Route _route;
 		private Route _pendingRoute;
 		private Job _job;
@@ -67,12 +67,12 @@ namespace Mob {
 			}
 		}
 
-		public Step GetActivityStep() {
+		public ActivityStep GetActivityStep() {
 			if( _job == default( Job ) ) {
 				return default;
 			}
 
-			return _job.Activity[ _currentActivity ].Step[ _currentStep ];
+			return _job.Activity[ _currentActivity ].Steps[ _currentStep ];
 		}
 
 		// Called from the Ui thread
@@ -92,7 +92,7 @@ namespace Mob {
 			if( _currentRouteIndex >= _route.Count ) {
 				_currentRouteIndex = -1;
 				_route = default;
-				Errand = _job.Activity[ _currentActivity ].Step[ _currentStep ].Errand;
+				Errand = _job.Activity[ _currentActivity ].Steps[ _currentStep ].Errand;
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace Mob {
 				Errand = Errand.Pathing;
 			} else {
 				_currentStep += 1;
-				if( _currentStep >= _job.Activity[ _currentActivity ].Step.Length ) {
+				if( _currentStep >= _job.Activity[ _currentActivity ].Steps.Length ) {
 					StepComplete();
 				} else {
 					SetRouteRequired();
@@ -114,7 +114,7 @@ namespace Mob {
 		}
 
 		private void SetRouteRequired() {
-			Step step = _job.Activity[ _currentActivity ].Step[ _currentStep ];
+			ActivityStep step = _job.Activity[ _currentActivity ].Steps[ _currentStep ];
 			if( ( step.Column != Column )
 				|| ( step.Row != Row ) ) {
 				Errand = Errand.WaitingToPath;

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Pathfinding.FastPriorityQueue;
+using System;
+using Pathfinding.BlueRajah;
 
 namespace Pathfinding.AStar
 {
-    public class AStarPriorityQueueNode: FastPriorityQueueNode
+    internal sealed class AStarPriorityQueueNode: FastPriorityQueueNode
     {
 		public int CellIndex;
     }

@@ -29,9 +29,9 @@ namespace Pathfinding.Profiler {
 		}
 
 		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Do( ref MapCell cell ) {
+			void IMapMethod.Invoke( ref MapCell cell ) {
 				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Direction.All;
+				cell.Walkability = (byte)Directions.All;
 			}
 		}
 

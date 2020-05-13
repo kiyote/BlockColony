@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Surface;
-using Pathfinding.FastPriorityQueue;
+using Pathfinding.BlueRajah;
 
 namespace Pathfinding.AStar {
 	internal class AStar : IMapNeighbourMethod {
@@ -101,7 +101,7 @@ namespace Pathfinding.AStar {
 			return path;
 		}
 
-		void IMapNeighbourMethod.Do( ref MapCell source, ref MapCell neighbour, Direction direction ) {
+		void IMapNeighbourMethod.Invoke( ref MapCell source, ref MapCell neighbour, Directions direction ) {
 			if( ( source.Walkability & (byte)direction ) != (byte)direction ) {
 				return;
 			}

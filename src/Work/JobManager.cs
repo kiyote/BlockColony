@@ -7,8 +7,8 @@ using Pathfinding;
 using System.Diagnostics;
 
 namespace Work {
-	public class JobManager : IPathfindingCallback {
-		public const int INITIAL_MAXIMUM = 100;
+	public sealed class JobManager : IPathfindingCallback, IDisposable {
+		public const int InitialMaximum = 100;
 
 		private readonly List<Job>[] _jobs;
 		private readonly AutoResetEvent _gate;
@@ -41,8 +41,8 @@ namespace Work {
 			_pendingJobs = new ConcurrentQueue<Job>();
 			_pathfindingManager = pathfindingManager;
 
-			_foundRoutes = new Route[ INITIAL_MAXIMUM ];
-			_fitness = new int[ INITIAL_MAXIMUM ];
+			_foundRoutes = new Route[ InitialMaximum ];
+			_fitness = new int[ InitialMaximum ];
 		}
 
 #if DEBUG
@@ -84,7 +84,7 @@ namespace Work {
 
 				Job job = GetNextJob();
 				while( job != default( Job ) ) {
-					Map map = _mapProvider.Get();
+					Map map = _mapProvider.Current();
 
 					// All the people available to handle the job
 					IJobFit[] fits = _jobFitProvider.GetAvailable();
@@ -223,7 +223,7 @@ namespace Work {
 			for( int i = 0; i < fits.Length; i++ ) {
 				IJobFit fit = fits[ i ];
 				Activity activity = job.Activity[ 0 ];
-				Step step = activity.Step[ 0 ];
+				ActivityStep step = activity.Steps[ 0 ];
 				ref MapCell location = ref map.GetCell( fit.LocationColumn, fit.LocationRow );
 				ref MapCell target = ref map.GetCell( step.Column, step.Row );
 				_pathfindingManager.GetPath( map, ref location, ref target, fit.Locomotion, this, i );
@@ -236,6 +236,10 @@ namespace Work {
 #endif
 			Interlocked.Exchange( ref _foundRoutes[ context ], route );
 			_gate.Set();
+		}
+
+		public void Dispose() {
+			_gate?.Dispose();
 		}
 	}
 }

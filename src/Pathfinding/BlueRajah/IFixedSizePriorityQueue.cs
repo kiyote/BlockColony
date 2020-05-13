@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System;
 
-namespace Pathfinding.FastPriorityQueue {
+namespace Pathfinding.BlueRajah {
 	/// <summary>
 	/// A helper-interface only needed to make writing unit tests a bit easier (hence the 'internal' access modifier)
 	/// </summary>

@@ -5,7 +5,7 @@ using Surface;
 using Work;
 
 namespace Mob {
-	public class ActorManager : IJobFitProvider {
+	public sealed class ActorManager : IJobFitProvider {
 		private readonly PathfindingManager _pathfindingManager;
 		private readonly List<Actor> _actors;
 		private readonly List<Actor> _idle;
@@ -36,15 +36,23 @@ namespace Mob {
 
 		// Called from the UI thread
 		public void UiUpdate() {
+			// Throw this away once there's code in here.
+			if (_actors == default) {
+				throw new InvalidOperationException();
+			}
 		}
 
 		// Called from the simulation thread
 		public void SimulationUpdate( Map map ) {
+			if (map == default) {
+				throw new ArgumentNullException( nameof( map ) );
+			}
+
 			foreach( Actor actor in _actors ) {
 				actor.SimulationUpdate();
 
 				if( actor.Errand == Errand.WaitingToPath ) {
-					Step step = actor.GetActivityStep();
+					ActivityStep step = actor.GetActivityStep();
 					ref MapCell target = ref map.GetCell( step.Column, step.Row );
 					ref MapCell source = ref map.GetCell( actor.Column, actor.Row );
 					_pathfindingManager.GetPath( map, ref source, ref target, actor.Locomotion, actor, Actor.MoveContext );

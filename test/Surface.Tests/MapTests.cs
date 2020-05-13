@@ -13,22 +13,22 @@ namespace Surface.Tests {
 			_map = new Map( Columns, Rows, new DefaultInitializer() );
 		}
 
-		[TestCase( 1, 0, Direction.North, 1, 2 )]
-		[TestCase( 0, 1, Direction.West, 2, 1 )]
-		[TestCase( 2, 1, Direction.East, 0, 1 )]
-		[TestCase( 1, 2, Direction.South, 1, 0 )]
-		[TestCase( 0, 0, Direction.NorthWest, 2, 2 )]
-		[TestCase( 1, 0, Direction.NorthWest, 0, 2 )]
-		[TestCase( 2, 0, Direction.NorthEast, 0, 2 )]
-		[TestCase( 1, 0, Direction.NorthEast, 2, 2 )]
-		[TestCase( 0, 2, Direction.SouthWest, 2, 0 )]
-		[TestCase( 1, 2, Direction.SouthWest, 0, 0 )]
-		[TestCase( 2, 2, Direction.SouthEast, 0, 0 )]
-		[TestCase( 1, 2, Direction.SouthEast, 2, 0 )]
+		[TestCase( 1, 0, Directions.North, 1, 2 )]
+		[TestCase( 0, 1, Directions.West, 2, 1 )]
+		[TestCase( 2, 1, Directions.East, 0, 1 )]
+		[TestCase( 1, 2, Directions.South, 1, 0 )]
+		[TestCase( 0, 0, Directions.NorthWest, 2, 2 )]
+		[TestCase( 1, 0, Directions.NorthWest, 0, 2 )]
+		[TestCase( 2, 0, Directions.NorthEast, 0, 2 )]
+		[TestCase( 1, 0, Directions.NorthEast, 2, 2 )]
+		[TestCase( 0, 2, Directions.SouthWest, 2, 0 )]
+		[TestCase( 1, 2, Directions.SouthWest, 0, 0 )]
+		[TestCase( 2, 2, Directions.SouthEast, 0, 0 )]
+		[TestCase( 1, 2, Directions.SouthEast, 2, 0 )]
 		public void GetNeighbour_TestWrapping_CoordinatesCorrect(
 			short column,
 			short row,
-			Direction direction,
+			Directions direction,
 			short expectedColumn,
 			short expectedRow
 		) {
@@ -39,9 +39,9 @@ namespace Surface.Tests {
 		}
 
 		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Do( ref MapCell cell ) {
+			void IMapMethod.Invoke( ref MapCell cell ) {
 				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Direction.All;
+				cell.Walkability = (byte)Directions.All;
 			}
 		}
 	}

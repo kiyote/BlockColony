@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System;
 
 namespace MapGenerator {
-	public class RiverTerrainOptions {
+	public sealed class RiverTerrainOptions {
 		public string Easy { get; set; }
 
 		public string Hard { get; set; }
 	}
 
-	public class LayerTerrainOptions {
+	public sealed class LayerTerrainOptions {
 		public string IdName { get; set; }
 	}
 
-	public class TerrainOptions {
+	public sealed class TerrainOptions {
 		public LayerTerrainOptions Outside { get; set; }
 
 		public LayerTerrainOptions Entry { get; set; }
@@ -25,7 +23,7 @@ namespace MapGenerator {
 		public RiverTerrainOptions River { get; set; }
 	}
 
-	public class MapGeneratorOptions {
+	public sealed class MapGeneratorOptions {
 
 		public short Columns { get; set; }
 

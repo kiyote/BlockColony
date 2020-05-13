@@ -49,50 +49,53 @@ namespace Mob.Tests {
 #if DEBUG
 		[Test]
 		public void SimulationUpdate_HasJob_PicksUpJob() {
-			using var gate = new AutoResetEvent( false );
-			_actor.JobAssigned += ( _, __ ) => {
-				gate.Set();
-			};
-			_actor.PathAssigned += ( _, __ ) => {
-				gate.Set();
-			};
+			using( var gate = new AutoResetEvent( false ) ) {
+				_actor.JobAssigned += ( _, __ ) => {
+					gate.Set();
+				};
+				_actor.PathAssigned += ( _, __ ) => {
+					gate.Set();
+				};
 
-			_jobManager.AddJob( CreateJob() );
-			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
-			gate.Reset();
+				_jobManager.AddJob( CreateJob() );
+				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
+				gate.Reset();
 
-			_actorManager.SimulationUpdate( _map );
+				_actorManager.SimulationUpdate( _map );
 
-			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
-			gate.Reset();
+				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
+				gate.Reset();
 
-			_actorManager.SimulationUpdate( _map );
-			Assert.AreNotEqual( -1, _actor.GetDesiredRouteStep() );
+				_actorManager.SimulationUpdate( _map );
+				Assert.AreNotEqual( -1, _actor.GetDesiredRouteStep() );
+			}
 		}
 
 		[Test]
 		public void RouteStepComplete_WalkingPath_DigWhenDone() {
-			using var gate = new AutoResetEvent( false );
-			_actor.JobAssigned += ( _, __ ) => {
-				gate.Set();
-			};
-			_actor.PathAssigned += ( _, __ ) => {
-				gate.Set();
-			};
+			using( var gate = new AutoResetEvent( false ) ) {
+				_actor.JobAssigned += ( _, __ ) => {
+					gate.Set();
+				};
+				_actor.PathAssigned += ( _, __ ) => {
+					gate.Set();
+				};
 
-			_jobManager.AddJob( CreateJob() );
-			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
-			gate.Reset();
-			_actorManager.SimulationUpdate( _map );
-			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
-			gate.Reset();
-			_actorManager.SimulationUpdate( _map );
+				_jobManager.AddJob( CreateJob() );
+				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
+				gate.Reset();
+				_actorManager.SimulationUpdate( _map );
+				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
+				gate.Reset();
+				_actorManager.SimulationUpdate( _map );
 
-			while( _actor.GetDesiredRouteStep() != -1 ) {
-				_actor.RouteStepComplete( ref _map.GetCell( _actor.GetDesiredRouteStep() ) );
+				while( _actor.GetDesiredRouteStep() != -1 ) {
+					_actor.RouteStepComplete( ref _map.GetCell( _actor.GetDesiredRouteStep() ) );
+				}
+
+				Assert.AreEqual( Errand.Dig, _actor.Errand );
+
 			}
-
-			Assert.AreEqual( Errand.Dig, _actor.Errand );
 		}
 #endif
 
@@ -110,19 +113,19 @@ namespace Mob.Tests {
 		}
 
 		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Do( ref MapCell cell ) {
+			void IMapMethod.Invoke( ref MapCell cell ) {
 				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Direction.All;
+				cell.Walkability = (byte)Directions.All;
 			}
 		}
 
-		Map IMapProvider.Get() {
+		Map IMapProvider.Current() {
 			return _map;
 		}
 
 		private Job CreateJob( int column = 2, int row = 2 ) {
-			var steps = new Step[ 1 ] {
-				new Step(Errand.Dig, column, row)
+			var steps = new ActivityStep[ 1 ] {
+				new ActivityStep(Errand.Dig, column, row)
 			};
 			var activities = new Activity[ 1 ] {
 				new Activity(steps)

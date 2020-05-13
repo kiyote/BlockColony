@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Work {
 	public class Job : IEquatable<Job> {
@@ -20,6 +21,9 @@ namespace Work {
 
 		public int Priority { get; }
 
+		[SuppressMessage(
+			"Performance", "CA1819:Properties should not return arrays",
+			Justification = "Performance" )]
 		public Activity[] Activity { get; }
 
 		public int Age { get; }

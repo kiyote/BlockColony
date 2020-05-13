@@ -6,7 +6,7 @@ using Pathfinding.AStar;
 using System.Diagnostics;
 
 namespace Pathfinding {
-	public class PathfindingManager {
+	public sealed class PathfindingManager: IDisposable {
 		private Thread _thread;
 		private readonly AutoResetEvent _gate;
 		private bool _terminated;
@@ -111,6 +111,11 @@ namespace Pathfinding {
 #if DEBUG
 			Stopped?.Invoke( this, EventArgs.Empty );
 #endif
+		}
+
+		public void Dispose() {
+			Stop();
+			_gate?.Dispose();
 		}
 	}
 }

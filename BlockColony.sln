@@ -34,7 +34,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{59E1E8C3-CE53-4FAE-A1C1-2C7F7BF6BD5C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		readme.md = readme.md
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FF0DC12D-50ED-4CEE-AC1B-5D1B84B99834}"

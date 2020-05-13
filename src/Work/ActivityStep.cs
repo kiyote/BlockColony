@@ -1,9 +1,9 @@
 using System;
 
 namespace Work {
-	public class Step : IEquatable<Step> {
+	public abstract class ActivityStep : IEquatable<ActivityStep> {
 
-		public Step(
+		public ActivityStep(
 			Errand errand,
 			int column,
 			int row
@@ -19,7 +19,7 @@ namespace Work {
 
 		public int Row { get; }
 
-		public bool Equals( Step other ) {
+		public bool Equals( ActivityStep other ) {
 			if( other is null ) {
 				return false;
 			}
@@ -34,7 +34,7 @@ namespace Work {
 		}
 
 		public override bool Equals( object obj ) {
-			return Equals( obj as Step );
+			return Equals( obj as ActivityStep );
 		}
 
 		public override int GetHashCode() {

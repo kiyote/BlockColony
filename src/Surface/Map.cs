@@ -1,25 +1,25 @@
-﻿using System;
+using System;
 
 namespace Surface {
 	public class Map {
 		private const int Unwalkable = int.MaxValue / 2;
 
-		private MapCell[] _cells;
-		private int _rowSize;
+		private readonly MapCell[] _cells;
+		private readonly int _rowSize;
 
 		//[Il2CppSetOption( Option.NullChecks, false )]
 		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		public Map( int columns, int rows, IMapMethod initializer ) {
 			if( initializer == default( IMapMethod ) ) {
-				throw new ArgumentException( nameof( initializer ) );
+				throw new ArgumentNullException( nameof( initializer ) );
 			}
 
 			if( columns <= 0 ) {
-				throw new ArgumentException( nameof( columns ) );
+				throw new ArgumentException( "Columns cannot be <= 0", nameof( columns ) );
 			}
 
 			if( rows <= 0 ) {
-				throw new ArgumentException( nameof( rows ) );
+				throw new ArgumentException( "Rows cannot be <= 0", nameof( rows ) );
 			}
 
 			_rowSize = columns;
@@ -32,13 +32,13 @@ namespace Surface {
 
 			for( int row = 0; row < rows; row++ ) {
 				for( int column = 0; column < columns; column++ ) {
-					var index = ( row * _rowSize ) + column;
-					ref var cell = ref _cells[ index ];
+					int index = ( row * _rowSize ) + column;
+					ref MapCell cell = ref _cells[ index ];
 					cell.Column = (short)column;
 					cell.Row = (short)row;
 					cell.Index = index;
 
-					initializer.Do( ref cell );
+					initializer.Invoke( ref cell );
 				}
 			}
 		}
@@ -60,24 +60,28 @@ namespace Surface {
 		}
 
 		public void ForEachNeighbour( int cellIndex, IMapNeighbourMethod method ) {
-			ref var cell = ref _cells[ cellIndex ];
-			method.Do( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row - 1 ), Direction.NorthWest );
-			method.Do( ref cell, ref GetWrappedCell( cell.Column, cell.Row - 1 ), Direction.North );
-			method.Do( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row - 1 ), Direction.NorthEast );
+			if (method == default) {
+				throw new ArgumentNullException( nameof( method ) );
+			}
 
-			method.Do( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row ), Direction.West );
-			method.Do( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row ), Direction.East );
+			ref MapCell cell = ref _cells[ cellIndex ];
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row - 1 ), Directions.NorthWest );
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column, cell.Row - 1 ), Directions.North );
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row - 1 ), Directions.NorthEast );
 
-			method.Do( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row + 1 ), Direction.SouthWest );
-			method.Do( ref cell, ref GetWrappedCell( cell.Column, cell.Row + 1 ), Direction.South );
-			method.Do( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row + 1 ), Direction.SouthEast );
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row ), Directions.West );
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row ), Directions.East );
+
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row + 1 ), Directions.SouthWest );
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column, cell.Row + 1 ), Directions.South );
+			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row + 1 ), Directions.SouthEast );
 		}
 
 		//[Il2CppSetOption( Option.NullChecks, false )]
 		//[Il2CppSetOption( Option.ArrayBounds, false )]
-		public int Cost( Locomotion locomotion, int sourceIndex, int targetIndex ) {
-			ref var source = ref _cells[ sourceIndex ];
-			ref var target = ref _cells[ targetIndex ];
+		public int Cost( Locomotion _, int sourceIndex, int targetIndex ) {
+			ref MapCell source = ref _cells[ sourceIndex ];
+			ref MapCell target = ref _cells[ targetIndex ];
 			int result;
 
 			if( target.TerrainLevel != 0 ) {
@@ -94,23 +98,23 @@ namespace Surface {
 			return result;
 		}
 
-		public ref MapCell GetNeighbour( ref MapCell cell, Direction direction ) {
+		public ref MapCell GetNeighbour( ref MapCell cell, Directions direction ) {
 			switch( direction ) {
-				case Direction.North:
+				case Directions.North:
 					return ref GetWrappedCell( cell.Column, cell.Row - 1 );
-				case Direction.NorthEast:
+				case Directions.NorthEast:
 					return ref GetWrappedCell( cell.Column + 1, cell.Row - 1 );
-				case Direction.East:
+				case Directions.East:
 					return ref GetWrappedCell( cell.Column + 1, cell.Row );
-				case Direction.SouthEast:
+				case Directions.SouthEast:
 					return ref GetWrappedCell( cell.Column + 1, cell.Row + 1 );
-				case Direction.South:
+				case Directions.South:
 					return ref GetWrappedCell( cell.Column, cell.Row + 1 );
-				case Direction.SouthWest:
+				case Directions.SouthWest:
 					return ref GetWrappedCell( cell.Column - 1, cell.Row + 1 );
-				case Direction.West:
+				case Directions.West:
 					return ref GetWrappedCell( cell.Column - 1, cell.Row );
-				case Direction.NorthWest:
+				case Directions.NorthWest:
 					return ref GetWrappedCell( cell.Column - 1, cell.Row - 1 );
 				default:
 					throw new ArgumentException( "Unknown direction" );

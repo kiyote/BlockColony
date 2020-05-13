@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 
 namespace Surface {
 	public interface IMapNeighbourMethod {
-		void Do( ref MapCell source, ref MapCell cell, Direction direction );
+		void Invoke( ref MapCell source, ref MapCell cell, Directions direction );
 	}
 }
