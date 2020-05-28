@@ -159,7 +159,7 @@ namespace Work {
 			return result;
 		}
 
-		private void CalculateNonPathFit( Job job, IJobFit[] fits ) {
+		private void CalculateNonPathFit( Job _, IJobFit[] fits ) {
 			for( int i = 0; i < fits.Length; i++ ) {
 				_fitness[ i ] = 100; // TODO: actually calculate a fitness score
 			}
@@ -182,7 +182,7 @@ namespace Work {
 		// First pass to see if any of the supplied IJobFit aren't even
 		// able to take on the specified job.  This way we don't do any work
 		// that would be discarded anyway.
-		private IJobFit[] FilterSuitable( Job job, IJobFit[] fits ) {
+		private static IJobFit[] FilterSuitable( Job _, IJobFit[] fits ) {
 			return fits;  // TODO: For now every fit is applicable
 		}
 

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Surface;
 
 namespace Work.Steps
@@ -9,6 +7,10 @@ namespace Work.Steps
     {
 		public MoveToStep(ref MapCell cell):
 			base(Errand.MoveTo, cell.Column, cell.Row) {
+		}
+
+		public MoveToStep( int column, int row ) :
+			base( Errand.MoveTo, column, row ) {
 		}
     }
 }

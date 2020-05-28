@@ -2,6 +2,7 @@ using System.Threading;
 using NUnit.Framework;
 using Pathfinding;
 using Surface;
+using Work.Steps;
 
 namespace Work.Tests {
 #if DEBUG
@@ -13,6 +14,13 @@ namespace Work.Tests {
 		private Map _map;
 		private IJobFit[] _fits;
 		private PathfindingManager _pathfindingManager;
+
+		private sealed class TestActivity : Activity {
+
+			public TestActivity( ActivityStep[] steps ) :
+				base( steps ) {
+			}
+		}
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
@@ -137,9 +145,9 @@ namespace Work.Tests {
 			};
 
 				var job = new Job( Job.Medium, new Activity[1] {
-				new Activity(
+				new TestActivity(
 					new ActivityStep[1] {
-						new ActivityStep(Errand.MoveTo, _map.HalfColumns, _map.HalfRows)
+						new MoveToStep(_map.HalfColumns, _map.HalfRows)
 					}
 				)
 			} );
@@ -165,9 +173,9 @@ namespace Work.Tests {
 			};
 
 				var job = new Job( Job.Medium, new Activity[1] {
-				new Activity(
+				new TestActivity(
 					new ActivityStep[1] {
-						new ActivityStep(Errand.MoveTo, _map.HalfColumns, _map.HalfRows)
+						new MoveToStep( _map.HalfColumns, _map.HalfRows )
 					}
 				)
 			} );
@@ -199,7 +207,7 @@ namespace Work.Tests {
 
 			private readonly AutoResetEvent _gate;
 
-			public TestJobFit(AutoResetEvent gate) {
+			public TestJobFit( AutoResetEvent gate ) {
 				_gate = gate;
 			}
 

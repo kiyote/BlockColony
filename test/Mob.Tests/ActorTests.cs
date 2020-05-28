@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Pathfinding;
 using Surface;
 using Work;
+using Work.Steps;
 
 namespace Mob.Tests {
 	[TestFixture]
@@ -14,6 +15,13 @@ namespace Mob.Tests {
 		private JobManager _jobManager;
 		private ActorManager _actorManager;
 		private PathfindingManager _pathfindingManager;
+
+		private sealed class TestActivity: Activity {
+
+			public TestActivity( ActivityStep[] steps ):
+				base(steps) {
+			}
+		}
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
@@ -124,11 +132,11 @@ namespace Mob.Tests {
 		}
 
 		private Job CreateJob( int column = 2, int row = 2 ) {
-			var steps = new ActivityStep[ 1 ] {
-				new ActivityStep(Errand.Dig, column, row)
+			var steps = new ActivityStep[1] {
+				new DigStep(column, row)
 			};
-			var activities = new Activity[ 1 ] {
-				new Activity(steps)
+			var activities = new Activity[1] {
+				new TestActivity(steps)
 			};
 			var job = new Job( Job.Medium, activities );
 
