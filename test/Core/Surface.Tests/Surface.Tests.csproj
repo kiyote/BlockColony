@@ -2,9 +2,13 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
-    <AssemblyName>Core.Mob.Tests</AssemblyName>
-    <RootNamespace>BlockColony.Core.Mob.Tests</RootNamespace>
+    <AssemblyName>Core.Surface.Tests</AssemblyName>
+    <RootNamespace>BlockColony.Core.Surface.Tests</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="valid.terrain.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
@@ -13,7 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Mob\Mob.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Shared\Shared.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
   </ItemGroup>
 
 </Project>

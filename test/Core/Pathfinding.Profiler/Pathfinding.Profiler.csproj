@@ -7,8 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Pathfinding\Pathfinding.csproj" />
-		<ProjectReference Include="..\..\src\Surface\Surface.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Pathfinding\Pathfinding.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
 	</ItemGroup>
 
 </Project>

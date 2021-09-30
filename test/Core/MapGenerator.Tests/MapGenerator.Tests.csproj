@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MapGenerator.Abstractions\MapGenerator.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\MapGenerator\MapGenerator.csproj" />
-    <ProjectReference Include="..\..\src\Shared\Shared.csproj" />
-    <ProjectReference Include="..\..\src\Surface\Surface.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\MapGenerator.Abstractions\MapGenerator.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\MapGenerator\MapGenerator.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Shared\Shared.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
   </ItemGroup>
 
 </Project>

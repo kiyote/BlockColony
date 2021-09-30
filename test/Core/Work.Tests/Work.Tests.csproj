@@ -13,10 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Pathfinding\Pathfinding.csproj" />
-    <ProjectReference Include="..\..\src\Surface.Abstractions\Surface.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\Work.Abstractions\Work.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\Work\Work.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Pathfinding\Pathfinding.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Surface.Abstractions\Surface.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Work.Abstractions\Work.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)src\Core\Work\Work.csproj" />
   </ItemGroup>
 
 </Project>
