@@ -2,7 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net5.0</TargetFramework>
+		<RootNamespace>BlockColony.Core.Pathfinding.Profiler</RootNamespace>
+		<AssemblyName>Core.Pathfinding.Profiler</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,6 +1,6 @@
 using System;
 
-namespace Surface {
+namespace BlockColony.Core.Surface {
 	public interface IMapMethod {
 		void Invoke( ref MapCell cell );
 	}

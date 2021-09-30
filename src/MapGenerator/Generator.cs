@@ -1,17 +1,27 @@
 using System;
 using System.Threading;
-using Surface;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Shared;
 
-namespace MapGenerator {
+namespace BlockColony.Core.MapGenerator {
 	internal sealed class Generator : IMapGenerator {
-		private TerrainManager _terrainManager;
+		private ITerrainManager _terrainManager;
 		private MapGeneratorOptions _options;
-		private Random _random;
+		private readonly IRandom _random;
+		private readonly IMapFactory _mapFactory;
 
-		private Map _map;
+		private IMap _map;
 		private event EventHandler _mapCompleted;
 
-		Map IMapGenerator.Map {
+		public Generator(
+			IMapFactory mapFactory,
+			IRandom random
+		) {
+			_mapFactory = mapFactory;
+			_random = random;
+		}
+
+		IMap IMapGenerator.Map {
 			get {
 				return _map;
 			}
@@ -30,10 +40,9 @@ namespace MapGenerator {
 		}
 
 		void IMapGenerator.Build(
-			TerrainManager terrainManager,
+			ITerrainManager terrainManager,
 			MapGeneratorOptions options
 		) {
-			_random = new Random();
 			_terrainManager = terrainManager;
 			_options = options;
 
@@ -47,12 +56,13 @@ namespace MapGenerator {
 		}
 
 		private void Run() {
-			Map map = new Map(
+			IMap map = _mapFactory.Create(
 				_options.Columns,
 				_options.Rows,
 				new CellInitializer(
 					_terrainManager,
-					_options ) );
+					_options )
+			);
 
 			int layerWidth = map.Columns / 4;
 			// Applying layers from far-right to far-left order, otherwise
@@ -73,11 +83,11 @@ namespace MapGenerator {
 
 		private class CellInitializer : IMapMethod {
 
-			private readonly TerrainManager _terrainManager;
+			private readonly ITerrainManager _terrainManager;
 			private readonly MapGeneratorOptions _options;
 
 			public CellInitializer(
-				TerrainManager terrainManager,
+				ITerrainManager terrainManager,
 				MapGeneratorOptions options
 			) {
 				_terrainManager = terrainManager;
@@ -97,8 +107,8 @@ namespace MapGenerator {
 		// Walks the left-edge of the map filling in to the right where a
 		// terrain hasn't otherwise been specified.
 		private static void FillOutsideEdge(
-			TerrainManager terrainManager,
-			Map map,
+			ITerrainManager terrainManager,
+			IMap map,
 			LayerTerrainOptions terrainOptions
 		) {
 			ITerrain terrain = terrainManager.GetByIdName( terrainOptions.IdName );
@@ -120,8 +130,8 @@ namespace MapGenerator {
 		}
 
 		private void ApplyTerrainLayer(
-			TerrainManager terrainManager,
-			Map map,
+			ITerrainManager terrainManager,
+			IMap map,
 			LayerTerrainOptions terrainOptions,
 			int startColumn,
 			int endColumn
@@ -152,11 +162,11 @@ namespace MapGenerator {
 			}
 		}
 
-		private void ApplyEasyRiver( TerrainManager terrainManager, Map map, RiverTerrainOptions riverOptions ) {
+		private void ApplyEasyRiver( ITerrainManager terrainManager, IMap map, RiverTerrainOptions riverOptions ) {
 			int startColumn = map.Columns / 3;
 			int startDrift = map.Columns / 10;
 
-			// The river falls one third of the way across the map, within a 
+			// The river falls one third of the way across the map, within a
 			// margin of +/- 10% of the width of the map
 			startColumn += ( _random.Next( startDrift / 2 ) + ( startDrift / 2 ) );
 			int currentColumn = startColumn;

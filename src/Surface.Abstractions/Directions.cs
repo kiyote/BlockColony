@@ -1,6 +1,6 @@
 using System;
 
-namespace Surface {
+namespace BlockColony.Core.Surface {
 	[Flags]
 	public enum Directions : byte {
 

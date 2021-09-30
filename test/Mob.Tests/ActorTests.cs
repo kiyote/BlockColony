@@ -1,27 +1,20 @@
 using System;
 using System.Threading;
 using NUnit.Framework;
-using Pathfinding;
-using Surface;
-using Work;
-using Work.Steps;
+using BlockColony.Core.Pathfinding;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Work;
+using BlockColony.Core.Work.Steps;
 
-namespace Mob.Tests {
+namespace BlockColony.Core.Mob.Tests {
 	[TestFixture]
 	public class ActorTests : IMapProvider {
 
 		private Actor _actor;
-		private Map _map;
+		private IMap _map;
 		private JobManager _jobManager;
 		private ActorManager _actorManager;
-		private PathfindingManager _pathfindingManager;
-
-		private sealed class TestActivity: Activity {
-
-			public TestActivity( ActivityStep[] steps ):
-				base(steps) {
-			}
-		}
+		private IPathfindingManager _pathfindingManager;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
@@ -57,53 +50,50 @@ namespace Mob.Tests {
 #if DEBUG
 		[Test]
 		public void SimulationUpdate_HasJob_PicksUpJob() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				_actor.JobAssigned += ( _, __ ) => {
-					gate.Set();
-				};
-				_actor.PathAssigned += ( _, __ ) => {
-					gate.Set();
-				};
+			using var gate = new AutoResetEvent( false );
+			_actor.JobAssigned += ( _, __ ) => {
+				gate.Set();
+			};
+			_actor.PathAssigned += ( _, __ ) => {
+				gate.Set();
+			};
 
-				_jobManager.AddJob( CreateJob() );
-				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
-				gate.Reset();
+			_jobManager.AddJob( CreateJob() );
+			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
+			gate.Reset();
 
-				_actorManager.SimulationUpdate( _map );
+			_actorManager.SimulationUpdate( _map );
 
-				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
-				gate.Reset();
+			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
+			gate.Reset();
 
-				_actorManager.SimulationUpdate( _map );
-				Assert.AreNotEqual( -1, _actor.GetDesiredRouteStep() );
-			}
+			_actorManager.SimulationUpdate( _map );
+			Assert.AreNotEqual( -1, _actor.GetDesiredRouteStep() );
 		}
 
 		[Test]
 		public void RouteStepComplete_WalkingPath_DigWhenDone() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				_actor.JobAssigned += ( _, __ ) => {
-					gate.Set();
-				};
-				_actor.PathAssigned += ( _, __ ) => {
-					gate.Set();
-				};
+			using var gate = new AutoResetEvent( false );
+			_actor.JobAssigned += ( _, __ ) => {
+				gate.Set();
+			};
+			_actor.PathAssigned += ( _, __ ) => {
+				gate.Set();
+			};
 
-				_jobManager.AddJob( CreateJob() );
-				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
-				gate.Reset();
-				_actorManager.SimulationUpdate( _map );
-				Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
-				gate.Reset();
-				_actorManager.SimulationUpdate( _map );
+			_jobManager.AddJob( CreateJob() );
+			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the job to be assigned
+			gate.Reset();
+			_actorManager.SimulationUpdate( _map );
+			Assert.IsTrue( gate.WaitOne( 500 ) ); // Wait for the path to be assigned
+			gate.Reset();
+			_actorManager.SimulationUpdate( _map );
 
-				while( _actor.GetDesiredRouteStep() != -1 ) {
-					_actor.RouteStepComplete( ref _map.GetCell( _actor.GetDesiredRouteStep() ) );
-				}
-
-				Assert.AreEqual( Errand.Dig, _actor.Errand );
-
+			while( _actor.GetDesiredRouteStep() != -1 ) {
+				_actor.RouteStepComplete( ref _map.GetCell( _actor.GetDesiredRouteStep() ) );
 			}
+
+			Assert.AreEqual( Errand.Dig, _actor.Errand );
 		}
 #endif
 
@@ -127,16 +117,16 @@ namespace Mob.Tests {
 			}
 		}
 
-		Map IMapProvider.Current() {
+		IMap IMapProvider.Current() {
 			return _map;
 		}
 
-		private Job CreateJob( int column = 2, int row = 2 ) {
+		private static IJob CreateJob( int column = 2, int row = 2 ) {
 			var steps = new ActivityStep[1] {
 				new DigStep(column, row)
 			};
 			var activities = new Activity[1] {
-				new TestActivity(steps)
+				new Activity(steps)
 			};
 			var job = new Job( Job.Medium, activities );
 

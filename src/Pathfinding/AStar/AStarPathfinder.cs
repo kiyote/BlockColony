@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Surface;
+using BlockColony.Core.Surface;
 
-namespace Pathfinding.AStar {
-	// This provides an implementation pool so that if we're running the 
+namespace BlockColony.Core.Pathfinding.AStar {
+	// This provides an implementation pool so that if we're running the
 	// pathfinding async then there is always an implementation available
 	// to be used exclusively by that task run.
 	internal sealed class AStarPathfinder : IPathfinder {
@@ -15,7 +15,7 @@ namespace Pathfinding.AStar {
 			_pool = new ConcurrentBag<AStar>();
 		}
 
-		Route IPathfinder.GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
+		Route IPathfinder.GetPath( IMap map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			int requiredNodes = map.Columns * map.Rows;
 			if( !_pool.TryTake( out AStar impl ) ) {
 				impl = new AStar( requiredNodes );
@@ -32,7 +32,7 @@ namespace Pathfinding.AStar {
 			return result;
 		}
 
-		Task<Route> IPathfinder.GetPathAsync( Map map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
+		Task<Route> IPathfinder.GetPathAsync( IMap map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
 
 			int requiredNodes = map.Columns * map.Rows;
 			if( !_pool.TryTake( out AStar impl ) ) {

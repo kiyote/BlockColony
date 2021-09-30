@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<RootNamespace>BlockColony.Core.Mob</RootNamespace>
+		<AssemblyName>Core.Mob</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Pathfinding\Pathfinding.csproj" />
-		<ProjectReference Include="..\Surface\Surface.csproj" />
-		<ProjectReference Include="..\Work\Work.csproj" />
+	  <ProjectReference Include="..\Mob.Abstractions\Mob.Abstractions.csproj" />
+	  <ProjectReference Include="..\Pathfinding.Abstractions\Pathfinding.Abstractions.csproj" />
+	  <ProjectReference Include="..\Pathfinding\Pathfinding.csproj" />
+	  <ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
+	  <ProjectReference Include="..\Work.Abstractions\Work.Abstractions.csproj" />
+	  <ProjectReference Include="..\Work\Work.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,21 +1,23 @@
 using System;
 using System.Collections.Generic;
-using Surface;
+using BlockColony.Core.Surface;
 using System.Threading;
 using System.Collections.Concurrent;
-using Pathfinding;
+using BlockColony.Core.Pathfinding;
+#if DEBUG
 using System.Diagnostics;
+#endif
 
-namespace Work {
+namespace BlockColony.Core.Work {
 	public sealed class JobManager : IPathfindingCallback, IDisposable {
 		public const int InitialMaximum = 100;
 
-		private readonly List<Job>[] _jobs;
+		private readonly List<IJob>[] _jobs;
 		private readonly AutoResetEvent _gate;
-		private readonly ConcurrentQueue<Job> _pendingJobs;
+		private readonly ConcurrentQueue<IJob> _pendingJobs;
 		private readonly IJobFitProvider _jobFitProvider;
 		private readonly IMapProvider _mapProvider;
-		private readonly PathfindingManager _pathfindingManager;
+		private readonly IPathfindingManager _pathfindingManager;
 
 		private Thread _thread;
 		private bool _terminated;
@@ -26,19 +28,19 @@ namespace Work {
 
 		public JobManager(
 			IJobFitProvider jobFitProvider,
-			PathfindingManager pathfindingManager,
+			IPathfindingManager pathfindingManager,
 			IMapProvider mapProvider
 		) {
 			_mapProvider = mapProvider;
 			_jobFitProvider = jobFitProvider;
-			_jobs = new List<Job>[ Job.PriorityCount ];
+			_jobs = new List<IJob>[ Job.PriorityCount ];
 			for( int i = 0; i < _jobs.Length; i++ ) {
-				_jobs[ i ] = new List<Job>();
+				_jobs[ i ] = new List<IJob>();
 			}
 
 			_gate = new AutoResetEvent( false );
 			_isRunning = false;
-			_pendingJobs = new ConcurrentQueue<Job>();
+			_pendingJobs = new ConcurrentQueue<IJob>();
 			_pathfindingManager = pathfindingManager;
 
 			_foundRoutes = new Route[ InitialMaximum ];
@@ -50,7 +52,7 @@ namespace Work {
 		public event EventHandler Stopped;
 #endif
 
-		public void AddJob( Job job ) {
+		public void AddJob( IJob job ) {
 			if( !_isRunning ) {
 				throw new InvalidOperationException( "Attempt to perform job with stopped job manager." );
 			}
@@ -82,9 +84,9 @@ namespace Work {
 #endif
 			while( !_terminated ) {
 
-				Job job = GetNextJob();
-				while( job != default( Job ) ) {
-					Map map = _mapProvider.Current();
+				IJob job = GetNextJob();
+				while( job != default( IJob ) ) {
+					IMap map = _mapProvider.Current();
 
 					// All the people available to handle the job
 					IJobFit[] fits = _jobFitProvider.GetAvailable();
@@ -102,7 +104,7 @@ namespace Work {
 					// Now we calculate the distance to the job for everyone
 					// left, eventually blocking until the pathing is complete.
 					StartPathing( map, job, fits );
-					// Non-path fitness is "suitability" for the job.  ie - Those 
+					// Non-path fitness is "suitability" for the job.  ie - Those
 					// with higher skills are more fit than those with lower skills.
 					CalculateNonPathFit( job, fits );
 					while( !PathingComplete() && !_terminated ) {
@@ -116,8 +118,8 @@ namespace Work {
 						// put it in the blocked jobs to be re-queued periodically
 						// TODO: create a blocked job queue
 					} else {
-						Job oldJob = handler.AssignJob( job );
-						if( oldJob != default( Job ) ) {
+						IJob oldJob = handler.AssignJob( job );
+						if( oldJob != default( IJob ) ) {
 							// We assigned them a new job before they started the
 							// old one, so requeue this one
 							AddJob( oldJob );
@@ -159,7 +161,7 @@ namespace Work {
 			return result;
 		}
 
-		private void CalculateNonPathFit( Job _, IJobFit[] fits ) {
+		private void CalculateNonPathFit( IJob _, IJobFit[] fits ) {
 			for( int i = 0; i < fits.Length; i++ ) {
 				_fitness[ i ] = 100; // TODO: actually calculate a fitness score
 			}
@@ -182,7 +184,7 @@ namespace Work {
 		// First pass to see if any of the supplied IJobFit aren't even
 		// able to take on the specified job.  This way we don't do any work
 		// that would be discarded anyway.
-		private static IJobFit[] FilterSuitable( Job _, IJobFit[] fits ) {
+		private static IJobFit[] FilterSuitable( IJob _, IJobFit[] fits ) {
 			return fits;  // TODO: For now every fit is applicable
 		}
 
@@ -193,12 +195,12 @@ namespace Work {
 			}
 		}
 
-		private Job GetNextJob() {
-			while( _pendingJobs.TryDequeue( out Job newJob ) ) {
+		private IJob GetNextJob() {
+			while( _pendingJobs.TryDequeue( out IJob newJob ) ) {
 				_jobs[ newJob.Priority ].Add( newJob );
 			}
 
-			Job result = default;
+			IJob result = default;
 			for( int i = 0; i < Job.PriorityCount; i++ ) {
 				if( _jobs[ i ].Count > 0 ) {
 					result = _jobs[ i ][ 0 ];
@@ -209,7 +211,7 @@ namespace Work {
 			return result;
 		}
 
-		private void StartPathing( Map map, Job job, IJobFit[] fits ) {
+		private void StartPathing( IMap map, IJob job, IJobFit[] fits ) {
 #if DEBUG
 			Debug.WriteLine( "JobManager:StartPathing" );
 #endif
@@ -222,7 +224,7 @@ namespace Work {
 
 			for( int i = 0; i < fits.Length; i++ ) {
 				IJobFit fit = fits[ i ];
-				Activity activity = job.Activity[ 0 ];
+				Activity activity = job.Activities[ 0 ];
 				ActivityStep step = activity.Steps[ 0 ];
 				ref MapCell location = ref map.GetCell( fit.LocationColumn, fit.LocationRow );
 				ref MapCell target = ref map.GetCell( step.Column, step.Row );

@@ -1,16 +1,10 @@
-using System;
-using Surface;
-using Work.Steps;
+using BlockColony.Core.Work.Steps;
 
-namespace Work.Actions
-{
-    public sealed class DigTileAction: Activity {
-
-		public DigTileAction(ref MapCell cell)
-			:base( new ActivityStep[] {
-				new MoveToStep( ref cell ),
-				new DigStep( ref cell )}
-			) {
+namespace BlockColony.Core.Work.Actions {
+	public sealed record DigTileAction(int column, int row): Activity(
+		new ActivityStep[] {
+			new MoveToStep( column, row ),
+			new DigStep( column, row )
 		}
-    }
+	);
 }

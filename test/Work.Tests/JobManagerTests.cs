@@ -1,26 +1,19 @@
 using System.Threading;
 using NUnit.Framework;
-using Pathfinding;
-using Surface;
-using Work.Steps;
+using BlockColony.Core.Pathfinding;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Work.Steps;
 
-namespace Work.Tests {
+namespace BlockColony.Core.Work.Tests {
 #if DEBUG
 	[TestFixture]
 	public class JobManagerTests : IJobFitProvider, IMapProvider {
 		private const int DELAY_MS = 500;
 		private AutoResetEvent _gate;
 		private JobManager _manager;
-		private Map _map;
+		private IMap _map;
 		private IJobFit[] _fits;
-		private PathfindingManager _pathfindingManager;
-
-		private sealed class TestActivity : Activity {
-
-			public TestActivity( ActivityStep[] steps ) :
-				base( steps ) {
-			}
-		}
+		private IPathfindingManager _pathfindingManager;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
@@ -53,139 +46,133 @@ namespace Work.Tests {
 
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new JobManager( this, _pathfindingManager, this );
-				int startCount = 0;
-				manager.Started += ( _, __ ) => {
-					startCount += 1;
-					gate.Set();
-				};
+			using var gate = new AutoResetEvent( false );
+			var manager = new JobManager( this, _pathfindingManager, this );
+			int startCount = 0;
+			manager.Started += ( _, __ ) => {
+				startCount += 1;
+				gate.Set();
+			};
 
-				manager.Start();
+			manager.Start();
 
-				gate.WaitOne( DELAY_MS );
-				manager.Stop();
-				Assert.That( startCount, Is.EqualTo( 1 ) );
-			}
+			gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			Assert.That( startCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new JobManager( this, _pathfindingManager, this );
-				int startCount = 0;
-				manager.Started += ( _, __ ) => {
-					startCount += 1;
-					gate.Set();
-				};
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
+			using var gate = new AutoResetEvent( false );
+			var manager = new JobManager( this, _pathfindingManager, this );
+			int startCount = 0;
+			manager.Started += ( _, __ ) => {
+				startCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Stop();
+			manager.Stop();
 
-				Assert.That( startCount, Is.EqualTo( 1 ) );
-			}
+			Assert.That( startCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new JobManager( this, _pathfindingManager, this );
-				int stopCount = 0;
-				manager.Started += ( _, __ ) => {
-					gate.Set();
-				};
-				manager.Stopped += ( _, __ ) => {
-					stopCount += 1;
-					gate.Set();
-				};
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
+			using var gate = new AutoResetEvent( false );
+			var manager = new JobManager( this, _pathfindingManager, this );
+			int stopCount = 0;
+			manager.Started += ( _, __ ) => {
+				gate.Set();
+			};
+			manager.Stopped += ( _, __ ) => {
+				stopCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Stop();
-				gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
 
-				Assert.That( stopCount, Is.EqualTo( 1 ) );
-			}
+			Assert.That( stopCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new JobManager( this, _pathfindingManager, this );
-				int stopCount = 0;
-				manager.Started += ( _, __ ) => {
-					gate.Set();
-				};
-				manager.Stopped += ( _, __ ) => {
-					stopCount += 1;
-					gate.Set();
-				};
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
-				manager.Stop();
-				gate.WaitOne( DELAY_MS );
+			using var gate = new AutoResetEvent( false );
+			var manager = new JobManager( this, _pathfindingManager, this );
+			int stopCount = 0;
+			manager.Started += ( _, __ ) => {
+				gate.Set();
+			};
+			manager.Stopped += ( _, __ ) => {
+				stopCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Stop();
-				gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
 
-				Assert.That( stopCount, Is.EqualTo( 1 ) );
-			}
+			Assert.That( stopCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void AddJob_OneFit_JobAssigned() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var fit = new TestJobFit( gate );
-				_fits = new IJobFit[1] {
+			using var gate = new AutoResetEvent( false );
+			var fit = new TestJobFit( gate );
+			_fits = new IJobFit[1] {
 				fit
 			};
 
-				var job = new Job( Job.Medium, new Activity[1] {
-				new TestActivity(
+			var job = new Job( Job.Medium, new Activity[1] {
+				new Activity(
 					new ActivityStep[1] {
 						new MoveToStep(_map.HalfColumns, _map.HalfRows)
 					}
 				)
 			} );
 
-				_manager.AddJob( job );
-				gate.WaitOne( DELAY_MS );
+			_manager.AddJob( job );
+			gate.WaitOne( DELAY_MS );
 
-				Assert.AreSame( job, fit.Job );
-			}
+			Assert.AreSame( job, fit.Job );
 		}
 
 		[Test]
 		public void AddJob_TwoFits_CloserFitChosen() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var fit1 = new TestJobFit( gate );
-				var fit2 = new TestJobFit( gate ) {
-					LocationColumn = _map.HalfColumns - 1,
-					LocationRow = _map.HalfRows - 1
-				};
-				_fits = new IJobFit[2] {
+			using var gate = new AutoResetEvent( false );
+			var fit1 = new TestJobFit( gate );
+			var fit2 = new TestJobFit( gate ) {
+				LocationColumn = _map.HalfColumns - 1,
+				LocationRow = _map.HalfRows - 1
+			};
+			_fits = new IJobFit[2] {
 				fit1,
 				fit2
 			};
 
-				var job = new Job( Job.Medium, new Activity[1] {
-				new TestActivity(
+			var job = new Job( Job.Medium, new Activity[1] {
+				new Activity(
 					new ActivityStep[1] {
 						new MoveToStep( _map.HalfColumns, _map.HalfRows )
 					}
 				)
 			} );
 
-				_manager.AddJob( job );
-				gate.WaitOne( DELAY_MS );
+			_manager.AddJob( job );
+			gate.WaitOne( DELAY_MS );
 
-				Assert.IsNull( fit1.Job );
-				Assert.AreSame( job, fit2.Job );
-			}
+			Assert.IsNull( fit1.Job );
+			Assert.AreSame( job, fit2.Job );
 		}
 
 		IJobFit[] IJobFitProvider.GetAvailable() {
@@ -199,7 +186,7 @@ namespace Work.Tests {
 			}
 		}
 
-		Map IMapProvider.Current() {
+		IMap IMapProvider.Current() {
 			return _map;
 		}
 
@@ -217,13 +204,13 @@ namespace Work.Tests {
 
 			public Locomotion Locomotion { get; set; }
 
-			public Job AssignJob( Job job ) {
+			public IJob AssignJob( IJob job ) {
 				Job = job;
 				_gate.Set();
 				return null;
 			}
 
-			public Job Job { get; set; }
+			public IJob Job { get; set; }
 		}
 	}
 #endif

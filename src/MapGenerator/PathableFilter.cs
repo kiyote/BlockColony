@@ -1,12 +1,12 @@
 using System;
-using Surface;
+using BlockColony.Core.Surface;
 
-namespace MapGenerator {
+namespace BlockColony.Core.MapGenerator {
 	public sealed class PathableFilter : IMapFunction<bool> {
 
-		private readonly TerrainManager _manager;
+		private readonly ITerrainManager _manager;
 
-		public PathableFilter( TerrainManager terrainManager ) {
+		public PathableFilter( ITerrainManager terrainManager ) {
 			_manager = terrainManager ?? throw new ArgumentNullException( nameof(terrainManager) );
 		}
 

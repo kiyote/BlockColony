@@ -1,37 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Surface {
+namespace BlockColony.Core.Surface {
 
-	public enum TerrainPhase {
-		Unknown,
-		Solid,
-		Liquid,
-		Gas
-	}
-
-	public interface ITerrainAttributes {
-
-		string Name { get; }
-
-		TerrainPhase Phase { get; }
-
-		int Colour { get; }
-
-		bool Pathable { get; }
-
-		int PathingCost { get; }
-	}
-
-	public interface ITerrain {
-		byte Id { get; }
-
-		string IdName { get; }
-
-		ITerrainAttributes this[ int celcius ] { get; }
-	}
-
-	internal class Terrain : ITerrain {
+	internal sealed class Terrain : ITerrain {
 
 		private readonly SortedList<int, ITerrainAttributes> _attributes;
 

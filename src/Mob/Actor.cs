@@ -1,15 +1,15 @@
 using System;
 using System.Threading;
-using Pathfinding;
-using Surface;
-using Work;
+using BlockColony.Core.Pathfinding;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Work;
 
-namespace Mob {
+namespace BlockColony.Core.Mob {
 	public sealed class Actor : IPathfindingCallback, IJobFit {
 		private Route _route;
 		private Route _pendingRoute;
-		private Job _job;
-		private Job _pendingJob;
+		private IJob _job;
+		private IJob _pendingJob;
 		private int _currentRouteIndex;
 
 		private int _currentActivity;
@@ -56,10 +56,10 @@ namespace Mob {
 				}
 			}
 
-			if( _job == default( Job ) ) {
+			if( _job == default( IJob ) ) {
 				_job = Interlocked.Exchange( ref _pendingJob, default );
 
-				if( _job != default( Job ) ) {
+				if( _job != default( IJob ) ) {
 					_currentActivity = 0;
 					_currentStep = 0;
 					SetRouteRequired();
@@ -68,11 +68,11 @@ namespace Mob {
 		}
 
 		public ActivityStep GetActivityStep() {
-			if( _job == default( Job ) ) {
+			if( _job == default( IJob ) ) {
 				return default;
 			}
 
-			return _job.Activity[ _currentActivity ].Steps[ _currentStep ];
+			return _job.Activities[ _currentActivity ].Steps[ _currentStep ];
 		}
 
 		// Called from the Ui thread
@@ -92,7 +92,7 @@ namespace Mob {
 			if( _currentRouteIndex >= _route.Count ) {
 				_currentRouteIndex = -1;
 				_route = default;
-				Errand = _job.Activity[ _currentActivity ].Steps[ _currentStep ].Errand;
+				Errand = _job.Activities[ _currentActivity ].Steps[ _currentStep ].Errand;
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace Mob {
 				Errand = Errand.Pathing;
 			} else {
 				_currentStep += 1;
-				if( _currentStep >= _job.Activity[ _currentActivity ].Steps.Length ) {
+				if( _currentStep >= _job.Activities[ _currentActivity ].Steps.Length ) {
 					StepComplete();
 				} else {
 					SetRouteRequired();
@@ -114,7 +114,7 @@ namespace Mob {
 		}
 
 		private void SetRouteRequired() {
-			ActivityStep step = _job.Activity[ _currentActivity ].Steps[ _currentStep ];
+			ActivityStep step = _job.Activities[ _currentActivity ].Steps[ _currentStep ];
 			if( ( step.Column != Column )
 				|| ( step.Row != Row ) ) {
 				Errand = Errand.WaitingToPath;
@@ -126,7 +126,7 @@ namespace Mob {
 		private void StepComplete() {
 			_currentActivity += 1;
 			_currentStep = 0;
-			if( _currentActivity >= _job.Activity.Length ) {
+			if( _currentActivity >= _job.Activities.Length ) {
 				_job = default;
 				_route = default;
 				_currentActivity = -1;
@@ -147,7 +147,7 @@ namespace Mob {
 				throw new InvalidOperationException( "Route received before previous route accepted." );
 			}
 
-			if( Errand == Errand.WaitingToPath ) {				
+			if( Errand == Errand.WaitingToPath ) {
 				ErrandComplete();
 			} else {
 				throw new InvalidOperationException( "Route received with no pending request." );
@@ -155,8 +155,8 @@ namespace Mob {
 		}
 
 		// This will be called from the Job thread
-		Job IJobFit.AssignJob( Job job ) {
-			Job result = Interlocked.Exchange( ref _pendingJob, job );
+		IJob IJobFit.AssignJob( IJob job ) {
+			IJob result = Interlocked.Exchange( ref _pendingJob, job );
 #if DEBUG
 			JobAssigned?.Invoke( this, EventArgs.Empty );
 #endif

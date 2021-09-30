@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
-using Surface;
-using Pathfinding.AStar;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Pathfinding.AStar;
 
-namespace Pathfinding.Profiler {
+namespace BlockColony.Core.Pathfinding.Profiler.Tests {
 	internal class Program {
 		private static void Main( string[] _ ) {
 			ProfileAStar();
@@ -15,7 +15,8 @@ namespace Pathfinding.Profiler {
 			const int iterations = 10;
 			const int size = 400;
 
-			Map map = new Map( size, size, new DefaultInitializer() );
+			IMap map = new Map( size, size, new DefaultInitializer() );
+
 			ref MapCell start = ref map.GetCell( (int)( (float)map.Columns * 0.25f ), (int)( (float)map.Rows * 0.25f ) );
 			ref MapCell goal = ref map.GetCell( map.Columns - (int)( (float)map.Columns * 0.25f ), map.Rows - (int)( (float)map.Rows * 0.25f ) );
 			IPathfinder pathfinder = new AStarPathfinder();

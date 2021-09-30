@@ -1,7 +1,7 @@
 using System;
-using Pathfinding.BlueRajah;
+using BlockColony.Core.Pathfinding.BlueRajah;
 
-namespace Pathfinding.AStar
+namespace BlockColony.Core.Pathfinding.AStar
 {
     internal sealed class AStarPriorityQueueNode: FastPriorityQueueNode
     {

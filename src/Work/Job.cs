@@ -1,8 +1,7 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Work {
-	public class Job : IEquatable<Job> {
+namespace BlockColony.Core.Work {
+	internal sealed class Job : IJob {
 		public const int PriorityCount = 10;
 		public const int Idle = 8;
 		public const int Low = 6;
@@ -15,16 +14,13 @@ namespace Work {
 			Activity[] activities
 		) {
 			Priority = priority;
-			Activity = activities ?? throw new InvalidOperationException();
+			Activities = activities ?? throw new InvalidOperationException();
 			State = JobState.Pending;
 		}
 
 		public int Priority { get; }
 
-		[SuppressMessage(
-			"Performance", "CA1819:Properties should not return arrays",
-			Justification = "Performance" )]
-		public Activity[] Activity { get; }
+		public Activity[] Activities { get; }
 
 		public int Age { get; }
 
@@ -34,9 +30,7 @@ namespace Work {
 			State = state;
 		}
 
-		//[Il2CppSetOption( Option.NullChecks, false )]
-		//[Il2CppSetOption( Option.ArrayBounds, false )]
-		public bool Equals( Job other ) {
+		public bool Equals( IJob other ) {
 			if( other is null ) {
 				return false;
 			}
@@ -52,8 +46,8 @@ namespace Work {
 				return false;
 			}
 
-			int sourceLength = Activity.Length;
-			int targetLength = other.Activity.Length;
+			int sourceLength = Activities.Length;
+			int targetLength = other.Activities.Length;
 
 			if( sourceLength != targetLength ) {
 				return false;
@@ -61,9 +55,9 @@ namespace Work {
 
 			for( int i = 0; i < sourceLength; i++ ) {
 				bool found = false;
-				ref Activity sourceAction = ref Activity[ i ];
+				ref Activity sourceAction = ref Activities[i];
 				for( int j = 0; j < targetLength; j++ ) {
-					ref Activity targetAction = ref other.Activity[ i ];
+					ref Activity targetAction = ref other.Activities[i];
 
 					if( sourceAction == targetAction ) {
 						found = true;
@@ -79,19 +73,17 @@ namespace Work {
 		}
 
 		public override bool Equals( object obj ) {
-			return Equals( obj as Job );
+			return Equals( obj as IJob );
 		}
 
-		//[Il2CppSetOption( Option.NullChecks, false )]
-		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		public override int GetHashCode() {
 			unchecked {
 				int result = Priority;
 				result = ( result * 31 ) + Age;
 				result = ( result * 31 ) + State.GetHashCode();
-				int length = Activity.Length;
+				int length = Activities.Length;
 				for( int i = 0; i < length; i++ ) {
-					result = ( result * 31 ) + Activity[ i ].GetHashCode();
+					result = ( result * 31 ) + Activities[i].GetHashCode();
 				}
 
 				return result;

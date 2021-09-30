@@ -1,6 +1,6 @@
 using System;
 
-namespace Mob {
+namespace BlockColony.Core.Mob {
 
 	public sealed class MovementEventArgs : EventArgs {
 		public int Column { get; set; }

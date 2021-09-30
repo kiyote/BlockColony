@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using Surface;
-using Pathfinding.AStar;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Pathfinding.AStar;
+#if DEBUG
 using System.Diagnostics;
+#endif
 
-namespace Pathfinding {
-	public sealed class PathfindingManager: IDisposable {
+namespace BlockColony.Core.Pathfinding {
+	internal sealed class PathfindingManager : IPathfindingManager {
 		private Thread _thread;
 		private readonly AutoResetEvent _gate;
 		private bool _terminated;
@@ -14,7 +16,7 @@ namespace Pathfinding {
 		private readonly IPathfinder _pathfinder;
 
 		private class PathRequest {
-			public Map Map;
+			public IMap Map;
 			public int StartColumn;
 			public int StartRow;
 			public int GoalColumn;
@@ -45,7 +47,7 @@ namespace Pathfinding {
 
 		public bool IsRunning { get; private set; }
 
-		public void GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion, IPathfindingCallback callback, int callbackContext ) {
+		public void GetPath( IMap map, ref MapCell start, ref MapCell goal, Locomotion locomotion, IPathfindingCallback callback, int callbackContext ) {
 			if( !IsRunning ) {
 				throw new InvalidOperationException( "Attempt to path with stopped pathfinding manager." );
 			}

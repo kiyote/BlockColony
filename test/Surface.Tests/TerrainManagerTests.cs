@@ -1,11 +1,10 @@
-using System;
 using System.IO;
-using System.Text;
 using System.Reflection;
+using System.Text;
+using BlockColony.Core.Shared;
 using NUnit.Framework;
-using Shared;
 
-namespace Surface.Tests {
+namespace BlockColony.Core.Surface.Tests {
 	[TestFixture]
 	public class TerrainManagerTests {
 		[Test]
@@ -20,9 +19,9 @@ namespace Surface.Tests {
 			Assert.AreEqual( "test_name", manager[1].IdName );
 		}
 
-		private StreamReader GetText( string name ) {
+		private static StreamReader GetText( string name ) {
 			var assembly = Assembly.GetExecutingAssembly();
-			Stream resourceStream = assembly.GetManifestResourceStream( "Surface." + name );
+			Stream resourceStream = assembly.GetManifestResourceStream( "BlockColony.Core.Surface.Tests." + name );
 			return new StreamReader( resourceStream, Encoding.UTF8 );
 		}
 	}

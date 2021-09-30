@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using Surface;
+﻿using BlockColony.Core.Surface;
 
-namespace Work {
+namespace BlockColony.Core.Work {
 
 	public interface IJobFit {
 		int LocationColumn { get; }
@@ -11,6 +9,6 @@ namespace Work {
 
 		Locomotion Locomotion { get; }
 
-		Job AssignJob( Job job );
+		IJob AssignJob( IJob job );
 	}
 }

@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <AssemblyName>Work.Tests</AssemblyName>
-    <RootNamespace>Work</RootNamespace>
+    <AssemblyName>Core.Work.Tests</AssemblyName>
+    <RootNamespace>BlockColony.Core.Work.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Pathfinding\Pathfinding.csproj" />
+    <ProjectReference Include="..\..\src\Surface.Abstractions\Surface.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Work.Abstractions\Work.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Work\Work.csproj" />
   </ItemGroup>
 

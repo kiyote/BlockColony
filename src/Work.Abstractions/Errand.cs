@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Work {
+namespace BlockColony.Core.Work {
 	public enum Errand {
 		Unknown,
 

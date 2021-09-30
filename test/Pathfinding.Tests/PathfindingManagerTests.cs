@@ -1,24 +1,24 @@
-using System;
-using System.Collections.Generic;
 using System.Threading;
-using Surface;
+using BlockColony.Core.Surface;
 using NUnit.Framework;
 
-namespace Pathfinding.Tests {
+namespace BlockColony.Core.Pathfinding.Tests {
 #if DEBUG
 	[TestFixture]
 	public class PathfindingManagerTests {
 		private const int DELAY_MS = 500;
-		private Map _map;
+		private IMap _map;
 		private DefaultInitializer _defaultInitializer;
 		private AutoResetEvent _gate;
 		private PathfindingCallback _callback;
-		private PathfindingManager _manager;
+		private IPathfindingManager _manager;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
+			IMapFactory factory = new MapFactory();
+
 			_defaultInitializer = new DefaultInitializer();
-			_map = new Map( 10, 10, _defaultInitializer );
+			_map = factory.Create( 10, 10, _defaultInitializer );
 		}
 
 		[SetUp]
@@ -42,89 +42,84 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new PathfindingManager();
-				int startCount = 0;
-				manager.Started += ( _, __ ) => {
-					startCount += 1;
-					gate.Set();
-				};
+			using var gate = new AutoResetEvent( false );
+			IPathfindingManager manager = new PathfindingManager();
+			int startCount = 0;
+			manager.Started += ( _, __ ) => {
+				startCount += 1;
+				gate.Set();
+			};
 
-				manager.Start();
+			manager.Start();
 
-				gate.WaitOne( DELAY_MS );
-				manager.Stop();
+			gate.WaitOne( DELAY_MS );
+			manager.Stop();
 
-				Assert.That( startCount, Is.EqualTo( 1 ) );
-			}
+			Assert.That( startCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void Start_AlreadyStarted_NoEffect() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new PathfindingManager();
-				int startCount = 0;
-				manager.Started += ( _, __ ) => {
-					startCount += 1;
-					gate.Set();
-				};
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
+			using var gate = new AutoResetEvent( false );
+			IPathfindingManager manager = new PathfindingManager();
+			int startCount = 0;
+			manager.Started += ( _, __ ) => {
+				startCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Stop();
+			manager.Stop();
 
-				Assert.That( startCount, Is.EqualTo( 1 ) );
-			}
+			Assert.That( startCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void Stop_NotStarted_NoEffect() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new PathfindingManager();
-				int stopCount = 0;
-				manager.Started += ( _, __ ) => {
-					gate.Set();
-				};
-				manager.Stopped += ( _, __ ) => {
-					stopCount += 1;
-					gate.Set();
-				};
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
+			using var gate = new AutoResetEvent( false );
+			IPathfindingManager manager = new PathfindingManager();
+			int stopCount = 0;
+			manager.Started += ( _, __ ) => {
+				gate.Set();
+			};
+			manager.Stopped += ( _, __ ) => {
+				stopCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Stop();
-				gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
 
-				Assert.That( stopCount, Is.EqualTo( 1 ) );
-			}
+			Assert.That( stopCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
 		public void Stop_AlreadyStarted_ThreadStopped() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var manager = new PathfindingManager();
-				int stopCount = 0;
-				manager.Started += ( _, __ ) => {
-					gate.Set();
-				};
-				manager.Stopped += ( _, __ ) => {
-					stopCount += 1;
-					gate.Set();
-				};
-				manager.Start();
-				gate.WaitOne( DELAY_MS );
-				manager.Stop();
-				gate.WaitOne( DELAY_MS );
+			using var gate = new AutoResetEvent( false );
+			IPathfindingManager manager = new PathfindingManager();
+			int stopCount = 0;
+			manager.Started += ( _, __ ) => {
+				gate.Set();
+			};
+			manager.Stopped += ( _, __ ) => {
+				stopCount += 1;
+				gate.Set();
+			};
+			manager.Start();
+			gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
 
-				manager.Stop();
-				gate.WaitOne( DELAY_MS );
+			manager.Stop();
+			gate.WaitOne( DELAY_MS );
 
-				Assert.That( stopCount, Is.EqualTo( 1 ) );
-
-			}
+			Assert.That( stopCount, Is.EqualTo( 1 ) );
 		}
 
 		[Test]
@@ -137,17 +132,16 @@ namespace Pathfinding.Tests {
 
 		[Test]
 		public void GetPath_ManagerNotStarted_ThrowsException() {
-			using( var gate = new AutoResetEvent( false ) ) {
-				var callback = new PathfindingCallback( gate );
-				var manager = new PathfindingManager();
+			using var gate = new AutoResetEvent( false );
+			var callback = new PathfindingCallback( gate );
+			IPathfindingManager manager = new PathfindingManager();
 
-				try {
-					Assert.That( () => {
-						manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback, 0 );
-					}, Throws.InvalidOperationException );
-				} finally {
-					manager.Stop();
-				}
+			try {
+				Assert.That( () => {
+					manager.GetPath( _map, ref _map.GetCell( 0, 0 ), ref _map.GetCell( _map.Columns - 1, _map.Rows - 1 ), Locomotion.Walk, callback, 0 );
+				}, Throws.InvalidOperationException );
+			} finally {
+				manager.Stop();
 			}
 		}
 

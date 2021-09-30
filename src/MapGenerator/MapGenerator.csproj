@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<RootNamespace>BlockColony.Core.MapGenerator</RootNamespace>
+		<AssemblyName>Core.MapGenerator</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Surface\Surface.csproj" />
+		<ProjectReference Include="..\MapGenerator.Abstractions\MapGenerator.Abstractions.csproj" />
+		<ProjectReference Include="..\Shared.Abstractions\Shared.Abstractions.csproj" />
+		<ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

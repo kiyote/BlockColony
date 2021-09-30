@@ -1,10 +1,10 @@
 using NUnit.Framework;
 
-namespace Surface.Tests {
+namespace BlockColony.Core.Surface.Tests {
 	[TestFixture]
 	public class MapTests {
 
-		private Map _map;
+		private IMap _map;
 
 		[OneTimeSetUp]
 		public void TestInitialize() {

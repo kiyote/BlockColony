@@ -1,5 +1,8 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo( "Surface.Tests" )]
-[assembly: InternalsVisibleTo( "MapGenerator.Tests" )]
+[assembly: InternalsVisibleTo( "Core.Surface.Tests" )]
+[assembly: InternalsVisibleTo( "Core.MapGenerator.Tests" )]
+[assembly: InternalsVisibleTo( "Core.Mob.Tests" )]
+[assembly: InternalsVisibleTo( "Core.Work.Tests" )]
+[assembly: InternalsVisibleTo( "Core.Pathfinding.Tests" )]
+[assembly: InternalsVisibleTo( "Core.Pathfinding.Profiler" )]

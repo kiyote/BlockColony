@@ -1,6 +1,6 @@
 using System;
 
-namespace Pathfinding.BlueRajah {
+namespace BlockColony.Core.Pathfinding.BlueRajah {
 
 	internal class FastPriorityQueueNode {
 		/// <summary>

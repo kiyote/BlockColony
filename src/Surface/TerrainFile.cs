@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Surface {
+namespace BlockColony.Core.Surface {
 	internal class TerrainFile {
 		public class PhaseConfig {
 			public class PhaseConfigEntry : ITerrainAttributes {

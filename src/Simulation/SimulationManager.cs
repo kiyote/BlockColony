@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
-using Mob;
-using Surface;
+using BlockColony.Core.Mob;
+using BlockColony.Core.Surface;
 
-namespace Simulation {
+namespace BlockColony.Core.Simulation {
 	public sealed class SimulationManager: IDisposable {
 		private Thread _thread;
 		private readonly AutoResetEvent _gate;
@@ -65,7 +65,7 @@ namespace Simulation {
 
 				// Perform a simulation tick
 				if( elapsedMilliseconds > 0 ) {
-					Map map = _mapProvider.Current();
+					IMap map = _mapProvider.Current();
 					_actors.SimulationUpdate( map );
 				}
 

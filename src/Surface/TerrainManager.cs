@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using Shared;
+using BlockColony.Core.Shared;
 
-namespace Surface {
+namespace BlockColony.Core.Surface {
 
-	public class TerrainManager {
+	internal sealed class TerrainManager : ITerrainManager {
 		private readonly Dictionary<int, Terrain> _terrain;
 		private readonly IJson _json;
 
@@ -17,9 +17,9 @@ namespace Surface {
 			_terrain = new Dictionary<int, Terrain>();
 		}
 
-		public ITerrain this[ int id ] {
+		public ITerrain this[int id] {
 			get {
-				return _terrain[ id ];
+				return _terrain[id];
 			}
 		}
 
@@ -28,7 +28,7 @@ namespace Surface {
 		}
 
 		public void Load( TextReader stream ) {
-			if (stream == default) {
+			if( stream == default ) {
 				throw new ArgumentNullException( nameof( stream ) );
 			}
 
@@ -40,7 +40,7 @@ namespace Surface {
 					return (transition: p.Transition, attribute: p as ITerrainAttributes);
 				} ) );
 
-				_terrain[ terrain.Id ] = terrain;
+				_terrain[terrain.Id] = terrain;
 			}
 		}
 

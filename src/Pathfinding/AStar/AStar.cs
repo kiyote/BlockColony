@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Surface;
-using Pathfinding.BlueRajah;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Pathfinding.BlueRajah;
 
-namespace Pathfinding.AStar {
+namespace BlockColony.Core.Pathfinding.AStar {
 	internal class AStar : IMapNeighbourMethod {
 
 		private static readonly Route Empty = new Route();
-		private Map _map;
+		private IMap _map;
 		private readonly Dictionary<int, int> _costSoFar;
 		private readonly Dictionary<int, int> _cameFrom;
 		private readonly FastPriorityQueue<AStarPriorityQueueNode> _frontier;
@@ -31,7 +31,7 @@ namespace Pathfinding.AStar {
 
 		public int MaximumNodes { get; }
 
-		static public int Heuristic( Map map, ref MapCell a, ref MapCell b ) {
+		static public int Heuristic( IMap map, ref MapCell a, ref MapCell b ) {
 			int dc = Math.Abs( a.Column - b.Column );
 			int dr = Math.Abs( a.Row - b.Row );
 
@@ -46,12 +46,12 @@ namespace Pathfinding.AStar {
 			return dc + dr;
 		}
 
-		public Route GetPath( Map map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
+		public Route GetPath( IMap map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
 			return GetPath( map, ref map.GetCell( startColumn, startRow ), ref map.GetCell( goalColumn, goalRow ), locomotion );
 		}
 
 			// Conduct the A* search
-		public Route GetPath( Map map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
+		public Route GetPath( IMap map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			_locomotion = locomotion;
 			_map = map;
 			var startNode = new AStarPriorityQueueNode {

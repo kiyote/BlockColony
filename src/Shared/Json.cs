@@ -1,10 +1,8 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Shared
-{
-	public class Json : IJson {
+namespace BlockColony.Core.Shared {
+	internal sealed class Json : IJson {
 
 		private readonly JsonSerializerOptions _options;
 
@@ -12,7 +10,9 @@ namespace Shared
 			_options = new JsonSerializerOptions {
 				Converters = {
 					new JsonStringEnumConverter()
-				}
+				},
+				PropertyNameCaseInsensitive = true,
+				AllowTrailingCommas = true
 			};
 		}
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Surface {
+namespace BlockColony.Core.Surface {
 	public struct MapCell: IEquatable<MapCell> {
 		public int Index { get; set; }
 		public short Row { get; set; }
@@ -50,22 +50,19 @@ namespace Surface {
 		}
 
 		public override int GetHashCode() {
-			unchecked {
-				int result = 17;
-				result = ( result * 31 ) + Index.GetHashCode();
-				result = ( result * 31 ) + Row.GetHashCode();
-				result = ( result * 31 ) + Column.GetHashCode();
-				result = ( result * 31 ) + TerrainCost.GetHashCode();
-				result = ( result * 31 ) + TerrainId.GetHashCode();
-				result = ( result * 31 ) + Temperature.GetHashCode();
-				result = ( result * 31 ) + Moisture.GetHashCode();
-				result = ( result * 31 ) + TerrainLevel.GetHashCode();
-				result = ( result * 31 ) + NewTemperature.GetHashCode();
-				result = ( result * 31 ) + NewTerrainId.GetHashCode();
-				result = ( result * 31 ) + NewMoisture.GetHashCode();
-
-				return result;
-			}
+			HashCode hash = new HashCode();
+			hash.Add( Index );
+			hash.Add( Row );
+			hash.Add( Column );
+			hash.Add( TerrainCost );
+			hash.Add( TerrainId );
+			hash.Add( Temperature );
+			hash.Add( Moisture );
+			hash.Add( TerrainLevel );
+			hash.Add( NewTemperature );
+			hash.Add( NewTerrainId );
+			hash.Add( NewMoisture );
+			return hash.ToHashCode();
 		}
 
 		public static bool operator ==( MapCell left, MapCell right ) {

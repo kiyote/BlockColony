@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>BlockColony.Core.Work</RootNamespace>
+		<AssemblyName>Core.Work.Abstractions</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
+	</ItemGroup>
+
+</Project>

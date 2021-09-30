@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<RootNamespace>BlockColony.Core.Surface</RootNamespace>
+		<AssemblyName>Core.Surface</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Shared.Abstractions\Shared.Abstractions.csproj" />
+	  <ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
 	</ItemGroup>
 
 

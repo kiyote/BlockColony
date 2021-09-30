@@ -1,28 +1,27 @@
-using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using Surface;
-using Newtonsoft.Json;
+using BlockColony.Core.Shared;
+using BlockColony.Core.Surface;
 using NUnit.Framework;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.ColorSpaces.Conversion;
-using Shared;
 
-namespace MapGenerator.Tests {
+namespace BlockColony.Core.MapGenerator.Tests {
 
 	[TestFixture]
 	public class MapGeneratorTests {
 
 		[Test]
 		public void Build_ValidOptions_MapGenerated() {
-			Json json = new Json();
-			IMapGenerator generator = new Generator();
+			IJson json = new Json();
+			IMapFactory mapFactory = new MapFactory();
+			IRandom random = new FastRandom();
+			IMapGenerator generator = new Generator(mapFactory, random);
 			var options = default( MapGeneratorOptions );
 			using( StreamReader reader = GetText( "generator.json" ) ) {
-				options = JsonConvert.DeserializeObject<MapGeneratorOptions>( reader.ReadToEnd() );
+				options = json.Deserialize<MapGeneratorOptions>( reader.ReadToEnd() );
 			}
 			var manager = new TerrainManager(json);
 			using( StreamReader reader = GetText( "terrain.json" ) ) {
@@ -45,45 +44,31 @@ namespace MapGenerator.Tests {
 			WriteMapToImage( generator.Map );
 		}
 
-		private StreamReader GetText( string name ) {
+		private static StreamReader GetText( string name ) {
 			var assembly = Assembly.GetExecutingAssembly();
-			Stream resourceStream = assembly.GetManifestResourceStream( "MapGenerator." + name );
+			Stream resourceStream = assembly.GetManifestResourceStream( "BlockColony.Core.MapGenerator.Tests." + name );
 			return new StreamReader( resourceStream, Encoding.UTF8 );
 		}
 
-		private void WriteMapToImage( Map map ) {
-			using( Image<Rgba32> image = new Image<Rgba32>( map.Columns, map.Rows ) ) {
-				for( int column = 0; column < map.Columns; column++ ) {
-					for( int row = 0; row < map.Rows; row++ ) {
-						ref MapCell cell = ref map.GetCell( column, row );
-						Rgba32 color = Color.White;
-						switch (cell.TerrainId) {
-							case 1:
-								color = Color.Blue;
-								break;
-							case 2:
-								color = Color.LawnGreen;
-								break;
-							case 4:
-								color = Color.SandyBrown;
-								break;
-							case 5:
-								color = Color.LightSlateGray;
-								break;
-							case 6:
-								color = Color.SlateGray;
-								break;
-							default:
-								color = Color.White;
-								break;
-						}
-						image[column, row] = color;
-					}
-				}
-				using( var writer = new FileStream( @"C:\temp\image.png", FileMode.Create ) ) {
-					image.SaveAsPng( writer );
+		private static void WriteMapToImage( IMap map ) {
+			using Image<Rgba32> image = new Image<Rgba32>( map.Columns, map.Rows );
+			for( int column = 0; column < map.Columns; column++ ) {
+				for( int row = 0; row < map.Rows; row++ ) {
+					ref MapCell cell = ref map.GetCell( column, row );
+					Rgba32 color = Color.White;
+					color = cell.TerrainId switch {
+						1 => Color.Blue,
+						2 => Color.LawnGreen,
+						4 => Color.SandyBrown,
+						5 => Color.LightSlateGray,
+						6 => Color.SlateGray,
+						_ => Color.White,
+					};
+					image[column, row] = color;
 				}
 			}
+			using var writer = new FileStream( @"C:\temp\image.png", FileMode.Create );
+			image.SaveAsPng( writer );
 		}
 	}
 }

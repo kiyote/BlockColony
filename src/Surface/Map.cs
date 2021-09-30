@@ -1,14 +1,12 @@
 using System;
 
-namespace Surface {
-	public class Map {
+namespace BlockColony.Core.Surface {
+	internal sealed class Map : IMap {
 		private const int Unwalkable = int.MaxValue / 2;
 
 		private readonly MapCell[] _cells;
 		private readonly int _rowSize;
 
-		//[Il2CppSetOption( Option.NullChecks, false )]
-		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		public Map( int columns, int rows, IMapMethod initializer ) {
 			if( initializer == default( IMapMethod ) ) {
 				throw new ArgumentNullException( nameof( initializer ) );
@@ -28,12 +26,12 @@ namespace Surface {
 			HalfColumns = columns / 2;
 			Rows = rows;
 			HalfRows = rows / 2;
-			_cells = new MapCell[ columns * rows ];
+			_cells = new MapCell[columns * rows];
 
 			for( int row = 0; row < rows; row++ ) {
 				for( int column = 0; column < columns; column++ ) {
 					int index = ( row * _rowSize ) + column;
-					ref MapCell cell = ref _cells[ index ];
+					ref MapCell cell = ref _cells[index];
 					cell.Column = (short)column;
 					cell.Row = (short)row;
 					cell.Index = index;
@@ -52,7 +50,7 @@ namespace Surface {
 		public int HalfRows { get; }
 
 		public ref MapCell GetCell( int index ) {
-			return ref _cells[ index ];
+			return ref _cells[index];
 		}
 
 		public ref MapCell GetCell( int column, int row ) {
@@ -60,11 +58,11 @@ namespace Surface {
 		}
 
 		public void ForEachNeighbour( int cellIndex, IMapNeighbourMethod method ) {
-			if (method == default) {
+			if( method == default ) {
 				throw new ArgumentNullException( nameof( method ) );
 			}
 
-			ref MapCell cell = ref _cells[ cellIndex ];
+			ref MapCell cell = ref _cells[cellIndex];
 			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row - 1 ), Directions.NorthWest );
 			method.Invoke( ref cell, ref GetWrappedCell( cell.Column, cell.Row - 1 ), Directions.North );
 			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row - 1 ), Directions.NorthEast );
@@ -77,11 +75,9 @@ namespace Surface {
 			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row + 1 ), Directions.SouthEast );
 		}
 
-		//[Il2CppSetOption( Option.NullChecks, false )]
-		//[Il2CppSetOption( Option.ArrayBounds, false )]
-		public int Cost( Locomotion _, int sourceIndex, int targetIndex ) {
-			ref MapCell source = ref _cells[ sourceIndex ];
-			ref MapCell target = ref _cells[ targetIndex ];
+		public int Cost( Locomotion locomotion, int sourceIndex, int targetIndex ) {
+			ref MapCell source = ref _cells[sourceIndex];
+			ref MapCell target = ref _cells[targetIndex];
 			int result;
 
 			if( target.TerrainLevel != 0 ) {
@@ -121,8 +117,6 @@ namespace Surface {
 			}
 		}
 
-		//[Il2CppSetOption( Option.NullChecks, false )]
-		//[Il2CppSetOption( Option.ArrayBounds, false )]
 		internal ref MapCell GetWrappedCell( int column, int row ) {
 			if( column < 0 ) {
 				column += Columns;
@@ -137,19 +131,19 @@ namespace Surface {
 			}
 
 			int index = ( row * _rowSize ) + column;
-			return ref _cells[ index ];
+			return ref _cells[index];
 
 		}
 
 		private static int Sqrt( int num ) {
-			if( 0 == num ) { return 0; }  // Avoid zero divide  
-			int n = ( num / 2 ) + 1;       // Initial estimate, never low  
+			if( 0 == num ) { return 0; }  // Avoid zero divide
+			int n = ( num / 2 ) + 1;       // Initial estimate, never low
 			int n1 = ( n + ( num / n ) ) / 2;
 			while( n1 < n ) {
 				n = n1;
 				n1 = ( n + ( num / n ) ) / 2;
-			} // end while  
+			} // end while
 			return n;
-		} // end Isqrt()  
+		} // end Isqrt()
 	}
 }

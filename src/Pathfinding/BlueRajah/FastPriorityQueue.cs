@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Pathfinding.BlueRajah {
+namespace BlockColony.Core.Pathfinding.BlueRajah {
 	/// <summary>
 	/// An implementation of a min-Priority Queue using a heap.  Has O(1) .Contains()!
 	/// See https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp/wiki/Getting-Started for more information
@@ -349,7 +349,7 @@ namespace Pathfinding.BlueRajah {
 		}
 
 		/// <summary>
-		/// This method must be called on a node every time its priority changes while it is in the queue.  
+		/// This method must be called on a node every time its priority changes while it is in the queue.
 		/// <b>Forgetting to call this method will result in a corrupted queue!</b>
 		/// Calling this method on a node not in the queue results in undefined behavior
 		/// O(log n)
@@ -383,7 +383,7 @@ namespace Pathfinding.BlueRajah {
 		}
 
 		/// <summary>
-		/// Removes a node from the queue.  The node does not need to be the head of the queue.  
+		/// Removes a node from the queue.  The node does not need to be the head of the queue.
 		/// If the node is not in the queue, the result is undefined.  If unsure, check Contains() first
 		/// O(log n)
 		/// </summary>

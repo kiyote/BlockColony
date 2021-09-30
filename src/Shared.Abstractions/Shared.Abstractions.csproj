@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<RootNamespace>Shared</RootNamespace>
+		<RootNamespace>BlockColony.Core.Shared</RootNamespace>
+		<AssemblyName>Core.Shared.Abstractions</AssemblyName>
 	</PropertyGroup>
 
 </Project>

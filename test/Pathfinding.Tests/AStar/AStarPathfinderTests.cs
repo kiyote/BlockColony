@@ -1,8 +1,8 @@
 using System;
-using Surface;
+using BlockColony.Core.Surface;
 using NUnit.Framework;
 
-namespace Pathfinding.AStar.Tests {
+namespace BlockColony.Core.Pathfinding.AStar.Tests {
 	[TestFixture]
 	public class AStarPathfinderTests {
 
@@ -30,7 +30,7 @@ namespace Pathfinding.AStar.Tests {
 			int goalRow,
 			Locomotion locomotion
 		) {
-			Map map = new Map( 10, 10, _defaultInitializer );
+			IMap map = new Map( 10, 10, _defaultInitializer );
 			ref MapCell start = ref map.GetCell( startColumn, startRow );
 			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
 			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
@@ -54,7 +54,7 @@ namespace Pathfinding.AStar.Tests {
 			int goalRow,
 			Locomotion locomotion
 		) {
-			Map map = new Map( 10, 10, _defaultInitializer );
+			IMap map = new Map( 10, 10, _defaultInitializer );
 
 			for( int column = 0; column < 10; column++ ) {
 				map.GetCell( column, 0 ).TerrainCost = 32000;
@@ -88,7 +88,7 @@ namespace Pathfinding.AStar.Tests {
 			int goalRow,
 			Locomotion locomotion
 		) {
-			Map map = new Map( 10, 10, _defaultInitializer );
+			IMap map = new Map( 10, 10, _defaultInitializer );
 			ref MapCell start = ref map.GetCell( startColumn, startRow );
 			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
 			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );

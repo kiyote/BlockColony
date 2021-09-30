@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
-using Pathfinding;
-using Surface;
-using Work;
+using BlockColony.Core.Pathfinding;
+using BlockColony.Core.Surface;
+using BlockColony.Core.Work;
 
-namespace Mob {
+namespace BlockColony.Core.Mob {
 	public sealed class ActorManager : IJobFitProvider {
-		private readonly PathfindingManager _pathfindingManager;
+		private readonly IPathfindingManager _pathfindingManager;
 		private readonly List<Actor> _actors;
 		private readonly List<Actor> _idle;
 
 		public ActorManager(
-			PathfindingManager pathfindingManager
+			IPathfindingManager pathfindingManager
 		) {
 			_pathfindingManager = pathfindingManager;
 
@@ -43,7 +43,7 @@ namespace Mob {
 		}
 
 		// Called from the simulation thread
-		public void SimulationUpdate( Map map ) {
+		public void SimulationUpdate( IMap map ) {
 			if (map == default) {
 				throw new ArgumentNullException( nameof( map ) );
 			}
@@ -60,7 +60,7 @@ namespace Mob {
 			}
 		}
 
-		private void MoveActor( Map map, Actor actor, MapCell goal ) {
+		private void MoveActor( IMap map, Actor actor, MapCell goal ) {
 			MakeBusy( actor );
 			ref MapCell source = ref map.GetCell( actor.Column, actor.Row );
 			_pathfindingManager.GetPath( map, ref source, ref goal, actor.Locomotion, actor, Actor.MoveContext );

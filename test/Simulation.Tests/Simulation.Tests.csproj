@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <AssemblyName>Simulation.Tests</AssemblyName>
-    <RootNamespace>Simulation</RootNamespace>
+    <AssemblyName>Core.Simulation.Tests</AssemblyName>
+    <RootNamespace>BlockColony.Core.Simulation.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
