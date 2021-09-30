@@ -15,6 +15,7 @@ namespace Surface {
 			}
 
 			public string Name { get; set; }
+
 			public PhaseConfigEntry[] Phases { get; set; }
 		}
 

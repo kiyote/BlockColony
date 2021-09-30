@@ -3,13 +3,15 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using NUnit.Framework;
+using Shared;
 
 namespace Surface.Tests {
 	[TestFixture]
 	public class TerrainManagerTests {
 		[Test]
 		public void Load_ValidTerrainFile_TerrainLoaded() {
-			var manager = new TerrainManager();
+			Json json = new Json();
+			var manager = new TerrainManager(json);
 			using( StreamReader reader = GetText( "valid.terrain.json" ) ) {
 				manager.Load( reader );
 			}

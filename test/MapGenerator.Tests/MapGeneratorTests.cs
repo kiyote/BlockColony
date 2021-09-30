@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.ColorSpaces.Conversion;
+using Shared;
 
 namespace MapGenerator.Tests {
 
@@ -17,12 +18,13 @@ namespace MapGenerator.Tests {
 
 		[Test]
 		public void Build_ValidOptions_MapGenerated() {
+			Json json = new Json();
 			IMapGenerator generator = new Generator();
 			var options = default( MapGeneratorOptions );
 			using( StreamReader reader = GetText( "generator.json" ) ) {
 				options = JsonConvert.DeserializeObject<MapGeneratorOptions>( reader.ReadToEnd() );
 			}
-			var manager = new TerrainManager();
+			var manager = new TerrainManager(json);
 			using( StreamReader reader = GetText( "terrain.json" ) ) {
 				manager.Load( reader );
 			}

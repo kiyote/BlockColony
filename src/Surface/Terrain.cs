@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Surface {
 
-	[JsonConverter( typeof( StringEnumConverter ) )]
 	public enum TerrainPhase {
 		Unknown,
 		Solid,
@@ -43,7 +39,7 @@ namespace Surface {
 			Id = (byte)id;
 			IdName = idName;
 			_attributes = new SortedList<int, ITerrainAttributes>();
-			foreach( var attribute in attributes ) {
+			foreach( (int Transition, ITerrainAttributes Attribute) attribute in attributes ) {
 				_attributes.Add( attribute.Transition, attribute.Attribute );
 			}
 		}

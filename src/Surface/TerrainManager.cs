@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using Newtonsoft.Json;
+using Shared;
 
 namespace Surface {
 
 	public class TerrainManager {
 		private readonly Dictionary<int, Terrain> _terrain;
+		private readonly IJson _json;
 
-		public TerrainManager() {
+		public TerrainManager(
+			IJson json
+		) {
+			_json = json;
 			_terrain = new Dictionary<int, Terrain>();
 		}
 
@@ -28,7 +32,7 @@ namespace Surface {
 				throw new ArgumentNullException( nameof( stream ) );
 			}
 
-			TerrainFile terrainConfig = JsonConvert.DeserializeObject<TerrainFile>( stream.ReadToEnd() );
+			TerrainFile terrainConfig = _json.Deserialize<TerrainFile>( stream.ReadToEnd() );
 
 			foreach( TerrainFile.TerrainConfig entry in terrainConfig.Terrain ) {
 				TerrainFile.PhaseConfig phase = terrainConfig.Phase.Where( p => string.Equals( p.Name, entry.Phase, StringComparison.OrdinalIgnoreCase ) ).First();
@@ -45,9 +49,8 @@ namespace Surface {
 				throw new ArgumentException( terrainFile );
 			}
 
-			using( var reader = new StreamReader( terrainFile ) ) {
-				Load( reader );
-			}
+			using var reader = new StreamReader( terrainFile );
+			Load( reader );
 		}
 	}
 }
