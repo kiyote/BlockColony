@@ -8,8 +8,8 @@ namespace BlockColony.Core.Mob {
 	public sealed class Actor : IPathfindingCallback, IJobFit {
 		private Route? _route;
 		private Route? _pendingRoute;
-		private IJob? _job;
-		private IJob? _pendingJob;
+		private Job? _job;
+		private Job? _pendingJob;
 		private int _currentRouteIndex;
 
 		private int _currentActivity;
@@ -56,10 +56,10 @@ namespace BlockColony.Core.Mob {
 				}
 			}
 
-			if( _job == default( IJob ) ) {
+			if( _job == default ) {
 				_job = Interlocked.Exchange( ref _pendingJob, default );
 
-				if( _job != default( IJob ) ) {
+				if( _job != default ) {
 					_currentActivity = 0;
 					_currentStep = 0;
 					SetRouteRequired();
@@ -68,7 +68,7 @@ namespace BlockColony.Core.Mob {
 		}
 
 		public ActivityStep? GetActivityStep() {
-			if( _job == default( IJob ) ) {
+			if( _job == default ) {
 				return default;
 			}
 
@@ -176,8 +176,8 @@ namespace BlockColony.Core.Mob {
 		}
 
 		// This will be called from the Job thread
-		IJob? IJobFit.AssignJob( IJob job ) {
-			IJob? result = Interlocked.Exchange( ref _pendingJob, job );
+		Job? IJobFit.AssignJob( Job job ) {
+			Job? result = Interlocked.Exchange( ref _pendingJob, job );
 #if DEBUG
 			JobAssigned?.Invoke( this, EventArgs.Empty );
 #endif

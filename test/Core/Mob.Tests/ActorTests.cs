@@ -121,14 +121,19 @@ namespace BlockColony.Core.Mob.Tests {
 			return _map;
 		}
 
-		private static IJob CreateJob( int column = 2, int row = 2 ) {
+		private static Job CreateJob( int column = 2, int row = 2 ) {
 			var steps = new ActivityStep[1] {
 				new DigStep(column, row)
 			};
 			var activities = new Activity[1] {
 				new Activity(steps)
 			};
-			var job = new Job( Job.Medium, activities );
+			var job = new Job(
+				JobManager.Medium,
+				activities,
+				0,
+				JobState.Pending
+			);
 
 			return job;
 		}

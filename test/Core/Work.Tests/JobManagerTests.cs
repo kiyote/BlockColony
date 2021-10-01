@@ -133,13 +133,18 @@ namespace BlockColony.Core.Work.Tests {
 				fit
 			};
 
-			var job = new Job( Job.Medium, new Activity[1] {
-				new Activity(
-					new ActivityStep[1] {
-						new MoveToStep(_map.HalfColumns, _map.HalfRows)
-					}
-				)
-			} );
+			var job = new Job(
+				JobManager.Medium,
+				new Activity[1] {
+					new Activity(
+						new ActivityStep[1] {
+							new MoveToStep(_map.HalfColumns, _map.HalfRows)
+						}
+					)
+				},
+				0,
+				JobState.Pending
+			);
 
 			_manager.AddJob( job );
 			gate.WaitOne( DELAY_MS );
@@ -160,13 +165,18 @@ namespace BlockColony.Core.Work.Tests {
 				fit2
 			};
 
-			var job = new Job( Job.Medium, new Activity[1] {
-				new Activity(
-					new ActivityStep[1] {
-						new MoveToStep( _map.HalfColumns, _map.HalfRows )
-					}
-				)
-			} );
+			var job = new Job(
+				JobManager.Medium,
+				new Activity[1] {
+					new Activity(
+						new ActivityStep[1] {
+							new MoveToStep( _map.HalfColumns, _map.HalfRows )
+						}
+					)
+				},
+				0,
+				JobState.Pending
+			);
 
 			_manager.AddJob( job );
 			gate.WaitOne( DELAY_MS );
@@ -204,13 +214,13 @@ namespace BlockColony.Core.Work.Tests {
 
 			public Locomotion Locomotion { get; set; }
 
-			public IJob AssignJob( IJob job ) {
+			public Job AssignJob( Job job ) {
 				Job = job;
 				_gate.Set();
 				return null;
 			}
 
-			public IJob Job { get; set; }
+			public Job Job { get; set; }
 		}
 	}
 #endif

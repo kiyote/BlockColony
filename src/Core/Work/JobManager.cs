@@ -10,11 +10,18 @@ using System.Diagnostics;
 
 namespace BlockColony.Core.Work {
 	public sealed class JobManager : IPathfindingCallback, IDisposable {
+		public const int PriorityCount = 10;
+		public const int Idle = 8;
+		public const int Low = 6;
+		public const int Medium = 4;
+		public const int High = 2;
+		public const int Critical = 0;
+
 		public const int InitialMaximum = 100;
 
-		private readonly List<IJob>[] _jobs;
+		private readonly List<Job>[] _jobs;
 		private readonly AutoResetEvent _gate;
-		private readonly ConcurrentQueue<IJob> _pendingJobs;
+		private readonly ConcurrentQueue<Job> _pendingJobs;
 		private readonly IJobFitProvider _jobFitProvider;
 		private readonly IMapProvider _mapProvider;
 		private readonly IPathfindingManager _pathfindingManager;
@@ -33,14 +40,14 @@ namespace BlockColony.Core.Work {
 		) {
 			_mapProvider = mapProvider;
 			_jobFitProvider = jobFitProvider;
-			_jobs = new List<IJob>[ Job.PriorityCount ];
+			_jobs = new List<Job>[ JobManager.PriorityCount ];
 			for( int i = 0; i < _jobs.Length; i++ ) {
-				_jobs[ i ] = new List<IJob>();
+				_jobs[ i ] = new List<Job>();
 			}
 
 			_gate = new AutoResetEvent( false );
 			_isRunning = false;
-			_pendingJobs = new ConcurrentQueue<IJob>();
+			_pendingJobs = new ConcurrentQueue<Job>();
 			_pathfindingManager = pathfindingManager;
 
 			_foundRoutes = new Route[ InitialMaximum ];
@@ -52,7 +59,7 @@ namespace BlockColony.Core.Work {
 		public event EventHandler? Stopped;
 #endif
 
-		public void AddJob( IJob? job ) {
+		public void AddJob( Job? job ) {
 			if( !_isRunning ) {
 				throw new InvalidOperationException( "Attempt to perform job with stopped job manager." );
 			}
@@ -89,7 +96,7 @@ namespace BlockColony.Core.Work {
 #endif
 			while( !_terminated ) {
 
-				IJob? job = GetNextJob();
+				Job? job = GetNextJob();
 				while( job != default ) {
 					IMap map = _mapProvider.Current();
 
@@ -123,7 +130,7 @@ namespace BlockColony.Core.Work {
 						// put it in the blocked jobs to be re-queued periodically
 						// TODO: create a blocked job queue
 					} else {
-						IJob? oldJob = handler.AssignJob( job );
+						Job? oldJob = handler.AssignJob( job );
 						if( oldJob != default ) {
 							// We assigned them a new job before they started the
 							// old one, so requeue this one
@@ -170,7 +177,7 @@ namespace BlockColony.Core.Work {
 			return result;
 		}
 
-		private void CalculateNonPathFit( IJob _, IJobFit[] fits ) {
+		private void CalculateNonPathFit( Job _, IJobFit[] fits ) {
 			for( int i = 0; i < fits.Length; i++ ) {
 				_fitness[ i ] = 100; // TODO: actually calculate a fitness score
 			}
@@ -193,7 +200,7 @@ namespace BlockColony.Core.Work {
 		// First pass to see if any of the supplied IJobFit aren't even
 		// able to take on the specified job.  This way we don't do any work
 		// that would be discarded anyway.
-		private static IJobFit[] FilterSuitable( IJob _, IJobFit[] fits ) {
+		private static IJobFit[] FilterSuitable( Job _, IJobFit[] fits ) {
 			return fits;  // TODO: For now every fit is applicable
 		}
 
@@ -204,13 +211,13 @@ namespace BlockColony.Core.Work {
 			}
 		}
 
-		private IJob? GetNextJob() {
-			while( _pendingJobs.TryDequeue( out IJob? newJob ) ) {
+		private Job? GetNextJob() {
+			while( _pendingJobs.TryDequeue( out Job? newJob ) ) {
 				_jobs[ newJob.Priority ].Add( newJob );
 			}
 
-			IJob? result = default;
-			for( int i = 0; i < Job.PriorityCount; i++ ) {
+			Job? result = default;
+			for( int i = 0; i < JobManager.PriorityCount; i++ ) {
 				if( _jobs[ i ].Count > 0 ) {
 					result = _jobs[ i ][ 0 ];
 					_jobs[ i ].Remove( result );
@@ -220,7 +227,7 @@ namespace BlockColony.Core.Work {
 			return result;
 		}
 
-		private void StartPathing( IMap map, IJob job, IJobFit[] fits ) {
+		private void StartPathing( IMap map, Job job, IJobFit[] fits ) {
 #if DEBUG
 			Debug.WriteLine( "JobManager:StartPathing" );
 #endif

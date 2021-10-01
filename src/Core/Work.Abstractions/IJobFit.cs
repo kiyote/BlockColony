@@ -9,6 +9,6 @@ namespace BlockColony.Core.Work {
 
 		Locomotion Locomotion { get; }
 
-		IJob? AssignJob( IJob job );
+		Job? AssignJob( Job job );
 	}
 }
