@@ -19,10 +19,10 @@ namespace BlockColony.Core.Work {
 		private readonly IMapProvider _mapProvider;
 		private readonly IPathfindingManager _pathfindingManager;
 
-		private Thread _thread;
+		private Thread? _thread;
 		private bool _terminated;
 		private bool _isRunning;
-		private Route[] _foundRoutes;
+		private Route?[] _foundRoutes;
 		private int[] _fitness;
 		private int _pendingRoutes;
 
@@ -48,13 +48,16 @@ namespace BlockColony.Core.Work {
 		}
 
 #if DEBUG
-		public event EventHandler Started;
-		public event EventHandler Stopped;
+		public event EventHandler? Started;
+		public event EventHandler? Stopped;
 #endif
 
-		public void AddJob( IJob job ) {
+		public void AddJob( IJob? job ) {
 			if( !_isRunning ) {
 				throw new InvalidOperationException( "Attempt to perform job with stopped job manager." );
+			}
+			if (job == default) {
+				throw new ArgumentException( "Attempt to add null job.", nameof( job ) );
 			}
 			_pendingJobs.Enqueue( job );
 			_gate.Set();
@@ -70,7 +73,9 @@ namespace BlockColony.Core.Work {
 		}
 
 		public void Stop() {
-			if( _isRunning ) {
+			if( _isRunning
+				&& _thread != default
+			) {
 				_terminated = true;
 				_gate.Set();
 				_thread.Join();
@@ -84,8 +89,8 @@ namespace BlockColony.Core.Work {
 #endif
 			while( !_terminated ) {
 
-				IJob job = GetNextJob();
-				while( job != default( IJob ) ) {
+				IJob? job = GetNextJob();
+				while( job != default ) {
 					IMap map = _mapProvider.Current();
 
 					// All the people available to handle the job
@@ -118,8 +123,8 @@ namespace BlockColony.Core.Work {
 						// put it in the blocked jobs to be re-queued periodically
 						// TODO: create a blocked job queue
 					} else {
-						IJob oldJob = handler.AssignJob( job );
-						if( oldJob != default( IJob ) ) {
+						IJob? oldJob = handler.AssignJob( job );
+						if( oldJob != default ) {
 							// We assigned them a new job before they started the
 							// old one, so requeue this one
 							AddJob( oldJob );
@@ -152,8 +157,12 @@ namespace BlockColony.Core.Work {
 			int result = -1;
 			int bestFit = int.MinValue;
 			for( int i = 0; i < fits.Length; i++ ) {
-				if( ( _fitness[ i ] - _foundRoutes[ i ].Count ) > bestFit ) {
-					bestFit = ( _fitness[ i ] - _foundRoutes[ i ].Count );
+				Route? route = _foundRoutes[i];
+				if (route == default) {
+					throw new InvalidOperationException( "Reference to null route." );
+				}
+				if( ( _fitness[ i ] - route.Count ) > bestFit ) {
+					bestFit = ( _fitness[ i ] - route.Count );
 					result = i;
 				}
 			}
@@ -195,12 +204,12 @@ namespace BlockColony.Core.Work {
 			}
 		}
 
-		private IJob GetNextJob() {
-			while( _pendingJobs.TryDequeue( out IJob newJob ) ) {
+		private IJob? GetNextJob() {
+			while( _pendingJobs.TryDequeue( out IJob? newJob ) ) {
 				_jobs[ newJob.Priority ].Add( newJob );
 			}
 
-			IJob result = default;
+			IJob? result = default;
 			for( int i = 0; i < Job.PriorityCount; i++ ) {
 				if( _jobs[ i ].Count > 0 ) {
 					result = _jobs[ i ][ 0 ];

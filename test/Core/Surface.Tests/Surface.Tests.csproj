@@ -1,24 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <AssemblyName>Core.Surface.Tests</AssemblyName>
-    <RootNamespace>BlockColony.Core.Surface.Tests</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<AssemblyName>Core.Surface.Tests</AssemblyName>
+		<RootNamespace>BlockColony.Core.Surface.Tests</RootNamespace>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="valid.terrain.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="valid.terrain.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+		<PackageReference Include="NUnit" Version="3.13.2" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)src\Core\Shared\Shared.csproj" />
-    <ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="$(SolutionDir)src\Core\Shared\Shared.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
+	</ItemGroup>
 
 </Project>

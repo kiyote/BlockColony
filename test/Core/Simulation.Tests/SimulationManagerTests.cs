@@ -7,6 +7,7 @@ using BlockColony.Core.Surface;
 namespace BlockColony.Core.Simulation.Tests {
 	[TestFixture]
 	public class SimulationManagerTests {
+#if DEBUG
 		private const int DELAY_MS = 500;
 
 		private ActorManager _actorManager;
@@ -18,7 +19,6 @@ namespace BlockColony.Core.Simulation.Tests {
 			_mapProvider = default;
 		}
 
-#if DEBUG
 		[Test]
 		public void Start_NotStarted_ThreadStarted() {
 			using var gate = new AutoResetEvent( false );

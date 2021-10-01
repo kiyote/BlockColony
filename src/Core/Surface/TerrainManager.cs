@@ -32,10 +32,13 @@ namespace BlockColony.Core.Surface {
 				throw new ArgumentNullException( nameof( stream ) );
 			}
 
-			TerrainFile terrainConfig = _json.Deserialize<TerrainFile>( stream.ReadToEnd() );
+			TerrainFile? terrainConfig = _json.Deserialize<TerrainFile>( stream.ReadToEnd() );
+			if (terrainConfig == null) {
+				throw new InvalidOperationException( "Unable to parse terrain file." );
+			}
 
-			foreach( TerrainFile.TerrainConfig entry in terrainConfig.Terrain ) {
-				TerrainFile.PhaseConfig phase = terrainConfig.Phase.Where( p => string.Equals( p.Name, entry.Phase, StringComparison.OrdinalIgnoreCase ) ).First();
+			foreach( TerrainConfig entry in terrainConfig.Terrain ) {
+				PhaseConfig phase = terrainConfig.Phase.Where( p => string.Equals( p.Name, entry.PhaseName, StringComparison.OrdinalIgnoreCase ) ).First();
 				var terrain = new Terrain( entry.Id, entry.IdName, phase.Phases.Select( p => {
 					return (transition: p.Transition, attribute: p as ITerrainAttributes);
 				} ) );

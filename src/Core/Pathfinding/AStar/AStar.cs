@@ -7,7 +7,6 @@ namespace BlockColony.Core.Pathfinding.AStar {
 	internal class AStar : IMapNeighbourMethod {
 
 		private static readonly Route Empty = new Route();
-		private IMap _map;
 		private readonly Dictionary<int, int> _costSoFar;
 		private readonly Dictionary<int, int> _cameFrom;
 		private readonly FastPriorityQueue<AStarPriorityQueueNode> _frontier;
@@ -53,7 +52,6 @@ namespace BlockColony.Core.Pathfinding.AStar {
 			// Conduct the A* search
 		public Route GetPath( IMap map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			_locomotion = locomotion;
-			_map = map;
 			var startNode = new AStarPriorityQueueNode {
 				CellIndex = start.Index
 			};
@@ -101,7 +99,7 @@ namespace BlockColony.Core.Pathfinding.AStar {
 			return path;
 		}
 
-		void IMapNeighbourMethod.Invoke( ref MapCell source, ref MapCell neighbour, Directions direction ) {
+		void IMapNeighbourMethod.Invoke( IMap map, ref MapCell source, ref MapCell neighbour, Directions direction ) {
 			if( ( source.Walkability & (byte)direction ) != (byte)direction ) {
 				return;
 			}
@@ -112,7 +110,7 @@ namespace BlockColony.Core.Pathfinding.AStar {
 			// adjacent (not diagonal) floor tile (1), newCost will be 2,
 			// or if the neighbor is diagonal, 1+Sqrt(2). And that will be the
 			// value assigned to costSoFar[neighbor] below.
-			int newCost = _costSoFar[_currentIndex] + _map.Cost( _locomotion, _currentIndex, neighbour.Index );
+			int newCost = _costSoFar[_currentIndex] + map.Cost( _locomotion, _currentIndex, neighbour.Index );
 
 			// If there's no cost assigned to the neighbor yet, or if the new
 			// cost is lower than the assigned one, add newCost for this neighbor
@@ -126,8 +124,8 @@ namespace BlockColony.Core.Pathfinding.AStar {
 
 				_costSoFar.Add( neighbour.Index, newCost );
 				_cameFrom.Add( neighbour.Index, _currentIndex );
-				ref MapCell goal = ref _map.GetCell( _goalIndex );
-				int priority = newCost + Heuristic( _map, ref neighbour, ref goal );
+				ref MapCell goal = ref map.GetCell( _goalIndex );
+				int priority = newCost + Heuristic( map, ref neighbour, ref goal );
 				var neighbourNode = new AStarPriorityQueueNode {
 					CellIndex = neighbour.Index
 				};

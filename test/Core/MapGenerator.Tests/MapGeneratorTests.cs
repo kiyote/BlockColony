@@ -18,30 +18,25 @@ namespace BlockColony.Core.MapGenerator.Tests {
 			IJson json = new Json();
 			IMapFactory mapFactory = new MapFactory();
 			IRandom random = new FastRandom();
-			IMapGenerator generator = new Generator(mapFactory, random);
+			var manager = new TerrainManager( json );
+			IMapGenerator generator = new Generator(mapFactory, random, manager);
 			var options = default( MapGeneratorOptions );
 			using( StreamReader reader = GetText( "generator.json" ) ) {
 				options = json.Deserialize<MapGeneratorOptions>( reader.ReadToEnd() );
 			}
-			var manager = new TerrainManager(json);
 			using( StreamReader reader = GetText( "terrain.json" ) ) {
 				manager.Load( reader );
 			}
 
-			int eventCount = 0;
+			IMap map = default;
 			using( var gate = new AutoResetEvent( false ) ) {
-				generator.MapGenerationCompleted += ( _, __ ) => {
-					eventCount++;
-					gate.Set();
-				};
-				generator.Build( manager, options );
-				gate.WaitOne( 10000 );
+				generator.Build( options, (IMap newMap) => map = newMap );
+				gate.WaitOne( 1000 ); // Bail after one second just in case.
 			}
 
-			Assert.AreEqual( 1, eventCount );
-			Assert.IsNotNull( generator.Map );
+			Assert.IsNotNull( map );
 
-			WriteMapToImage( generator.Map );
+			WriteMapToImage( map );
 		}
 
 		private static StreamReader GetText( string name ) {

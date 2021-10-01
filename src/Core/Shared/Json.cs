@@ -16,7 +16,7 @@ namespace BlockColony.Core.Shared {
 			};
 		}
 
-		T IJson.Deserialize<T>( string json ) {
+		T? IJson.Deserialize<T>( string json ) where T: class {
 			return JsonSerializer.Deserialize<T>( json, _options );
 		}
 

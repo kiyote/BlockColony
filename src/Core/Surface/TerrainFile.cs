@@ -1,34 +1,26 @@
-﻿using System;
+﻿namespace BlockColony.Core.Surface {
 
-namespace BlockColony.Core.Surface {
-	internal class TerrainFile {
-		public class PhaseConfig {
-			public class PhaseConfigEntry : ITerrainAttributes {
-				public int Transition { get; set; }
-				public string Name { get; set; }
-				public TerrainPhase Phase { get; set; }
-				public int Colour { get; set; }
+	internal record PhaseConfigEntry(
+		int Transition,
+		string Name,
+		TerrainPhase Phase,
+		bool Pathable,
+		int PathingCost
+	) : ITerrainAttributes { }
 
-				public bool Pathable { get; set; }
+	internal record PhaseConfig(
+		string Name,
+		PhaseConfigEntry[] Phases
+	);
 
-				public int PathingCost { get; set; }
-			}
+	internal record TerrainConfig(
+		byte Id,
+		string IdName,
+		string PhaseName
+	);
 
-			public string Name { get; set; }
-
-			public PhaseConfigEntry[] Phases { get; set; }
-		}
-
-		public class TerrainConfig {
-			public byte Id { get; set; }
-
-			public string IdName { get; set; }
-
-			public string Phase { get; set; }
-		}
-
-		public PhaseConfig[] Phase { get; set; }
-
-		public TerrainConfig[] Terrain { get; set; }
-	}
+	internal record TerrainFile(
+		PhaseConfig[] Phase,
+		TerrainConfig[] Terrain
+	);
 }

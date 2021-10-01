@@ -4,6 +4,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>BlockColony.Core.Pathfinding.Profiler</RootNamespace>
 		<AssemblyName>Core.Pathfinding.Profiler</AssemblyName>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

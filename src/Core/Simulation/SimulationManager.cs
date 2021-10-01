@@ -27,8 +27,8 @@ namespace BlockColony.Core.Simulation {
 #if DEBUG
 		// These events run on the simulation thread, so use these at
 		// your own peril!
-		public event EventHandler Started;
-		public event EventHandler Stopped;
+		public event EventHandler? Started;
+		public event EventHandler? Stopped;
 #endif
 
 		public void Start() {

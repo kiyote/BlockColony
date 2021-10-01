@@ -30,7 +30,7 @@ namespace BlockColony.Core.Work {
 			State = state;
 		}
 
-		public bool Equals( IJob other ) {
+		public bool Equals( IJob? other ) {
 			if( other is null ) {
 				return false;
 			}
@@ -72,7 +72,7 @@ namespace BlockColony.Core.Work {
 			return true;
 		}
 
-		public override bool Equals( object obj ) {
+		public override bool Equals( object? obj ) {
 			return Equals( obj as IJob );
 		}
 

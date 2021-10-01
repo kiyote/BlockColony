@@ -3,37 +3,37 @@
     {
       "id": 1,
       "idname": "water",
-      "phase": "water"
+      "phasename": "water"
     },
     {
       "id": 2,
       "idname": "air",
-      "phase": "air"
+      "phasename": "air"
     },
     {
       "id": 3,
       "idname": "soil",
-      "phase": "soil"
+      "phasename": "soil"
     },
     {
       "id": 4,
       "idname": "sandstone",
-      "phase": "sandstone"
+      "phasename": "sandstone"
     },
     {
       "id": 5,
       "idname": "igneous",
-      "phase": "igneous"
+      "phasename": "igneous"
     },
     {
       "id": 6,
       "idname": "granite",
-      "phase": "granite"
+      "phasename": "granite"
     },
     {
       "id": 7,
       "idname": "magma",
-      "phase": "magma"
+      "phasename": "magma"
     }
   ],
   "phase": [

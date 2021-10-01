@@ -52,7 +52,10 @@ namespace BlockColony.Core.Mob {
 				actor.SimulationUpdate();
 
 				if( actor.Errand == Errand.WaitingToPath ) {
-					ActivityStep step = actor.GetActivityStep();
+					ActivityStep? step = actor.GetActivityStep();
+					if (step == default) {
+						throw new InvalidOperationException( "SimulationUpdate: Errand waiting to path with no ActivityStep." );
+					}
 					ref MapCell target = ref map.GetCell( step.Column, step.Row );
 					ref MapCell source = ref map.GetCell( actor.Column, actor.Row );
 					_pathfindingManager.GetPath( map, ref source, ref target, actor.Locomotion, actor, Actor.MoveContext );

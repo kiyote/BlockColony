@@ -26,7 +26,7 @@ namespace BlockColony.Core.Surface {
 		/// <seealso cref="Directions"/>
 		public byte Walkability { get; set; }
 
-		public override bool Equals( object obj ) {
+		public override bool Equals( object? obj ) {
 			if (!(obj is MapCell)) {
 				return false;
 			}

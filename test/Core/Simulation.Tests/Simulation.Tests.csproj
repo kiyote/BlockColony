@@ -1,23 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <AssemblyName>Core.Simulation.Tests</AssemblyName>
-    <RootNamespace>BlockColony.Core.Simulation.Tests</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<AssemblyName>Core.Simulation.Tests</AssemblyName>
+		<RootNamespace>BlockColony.Core.Simulation.Tests</RootNamespace>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+		<PackageReference Include="NUnit" Version="3.13.2" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)src\Core\Mob\Mob.csproj" />
-    <ProjectReference Include="$(SolutionDir)src\Core\Pathfinding\Pathfinding.csproj" />
-    <ProjectReference Include="$(SolutionDir)src\Core\Simulation\Simulation.csproj" />
-    <ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
-    <ProjectReference Include="$(SolutionDir)src\Core\Work\Work.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="$(SolutionDir)src\Core\Mob\Mob.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Pathfinding\Pathfinding.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Simulation\Simulation.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Work\Work.csproj" />
+	</ItemGroup>
 
 </Project>

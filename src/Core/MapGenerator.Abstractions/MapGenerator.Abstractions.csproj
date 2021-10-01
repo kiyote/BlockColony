@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <RootNamespace>BlockColony.Core.MapGenerator</RootNamespace>
-    <AssemblyName>Core.MapGenerator.Abstractions</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<RootNamespace>BlockColony.Core.MapGenerator</RootNamespace>
+		<AssemblyName>Core.MapGenerator.Abstractions</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
+	</ItemGroup>
 
 </Project>

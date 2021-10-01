@@ -5,49 +5,25 @@ using BlockColony.Core.Shared;
 
 namespace BlockColony.Core.MapGenerator {
 	internal sealed class Generator : IMapGenerator {
-		private ITerrainManager _terrainManager;
-		private MapGeneratorOptions _options;
+		private readonly ITerrainManager _terrainManager;
 		private readonly IRandom _random;
 		private readonly IMapFactory _mapFactory;
 
-		private IMap _map;
-		private event EventHandler _mapCompleted;
-
 		public Generator(
 			IMapFactory mapFactory,
-			IRandom random
+			IRandom random,
+			ITerrainManager terrainManager
 		) {
 			_mapFactory = mapFactory;
 			_random = random;
-		}
-
-		IMap IMapGenerator.Map {
-			get {
-				return _map;
-			}
-		}
-
-		// This event is raised on the map generator thread, so don't use this
-		// except in exceptionally well controlled circumstances.
-		event EventHandler IMapGenerator.MapGenerationCompleted {
-			add {
-				_mapCompleted += value;
-			}
-
-			remove {
-				_mapCompleted -= value;
-			}
+			_terrainManager = terrainManager;
 		}
 
 		void IMapGenerator.Build(
-			ITerrainManager terrainManager,
-			MapGeneratorOptions options
+			MapGeneratorOptions options,
+			Action<IMap> handler
 		) {
-			_terrainManager = terrainManager;
-			_options = options;
-
-			_map = default;
-			Thread thread = new Thread( Run ) {
+			Thread thread = new Thread( () => Run(options, handler) ) {
 				Name = "Map Generator Thread"
 			};
 			thread.Start();
@@ -55,30 +31,32 @@ namespace BlockColony.Core.MapGenerator {
 			// completion of the map generation and the population of _map.
 		}
 
-		private void Run() {
+		private void Run(
+			MapGeneratorOptions options,
+			Action<IMap> mapCompleted
+		) {
 			IMap map = _mapFactory.Create(
-				_options.Columns,
-				_options.Rows,
+				options.Columns,
+				options.Rows,
 				new CellInitializer(
 					_terrainManager,
-					_options )
+					options )
 			);
 
 			int layerWidth = map.Columns / 4;
 			// Applying layers from far-right to far-left order, otherwise
 			// the function wouldn't know when to stop applying its terrain
-			ApplyTerrainLayer( _terrainManager, map, _options.Terrain.Far, layerWidth * 3, map.Columns );
-			ApplyTerrainLayer( _terrainManager, map, _options.Terrain.Middle, layerWidth * 2, map.Columns );
-			ApplyTerrainLayer( _terrainManager, map, _options.Terrain.Entry, layerWidth * 1, map.Columns );
-			ApplyTerrainLayer( _terrainManager, map, _options.Terrain.Outside, 0, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Far, layerWidth * 3, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Middle, layerWidth * 2, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Entry, layerWidth * 1, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Outside, 0, map.Columns );
 
 			// Otherwise the left-edge of the map will be jagged
-			FillOutsideEdge( _terrainManager, map, _options.Terrain.Outside );
+			FillOutsideEdge( _terrainManager, map, options.Terrain.Outside );
 
-			ApplyEasyRiver( _terrainManager, map, _options.Terrain.River );
+			ApplyEasyRiver( _terrainManager, map, options.Terrain.River );
 
-			Interlocked.Exchange( ref _map, map );
-			_mapCompleted?.Invoke( this, EventArgs.Empty );
+			mapCompleted( map );
 		}
 
 		private class CellInitializer : IMapMethod {
@@ -97,7 +75,7 @@ namespace BlockColony.Core.MapGenerator {
 			void IMapMethod.Invoke( ref MapCell cell ) {
 				cell.NewTemperature = (byte)_options.AmbientTemperature;
 
-				ITerrain terrain = _terrainManager?[ 3 ];  // Magically know this is soil!
+				ITerrain terrain = _terrainManager[ 3 ];  // Magically know this is soil!
 				cell.NewTerrainId = 0;
 				cell.NewMoisture = 0;
 				cell.TerrainCost = (short)terrain[ _options.AmbientTemperature ].PathingCost;

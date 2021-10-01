@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <RootNamespace>BlockColony.Core.Surface</RootNamespace>
-    <AssemblyName>Core.Surface.Abstractions</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<RootNamespace>BlockColony.Core.Surface</RootNamespace>
+		<AssemblyName>Core.Surface.Abstractions</AssemblyName>
+	</PropertyGroup>
 
 </Project>

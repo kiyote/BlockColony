@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>BlockColony.Core.Mob</RootNamespace>
-    <AssemblyName>Core.Mob.Abstractions</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<RootNamespace>BlockColony.Core.Mob</RootNamespace>
+		<AssemblyName>Core.Mob.Abstractions</AssemblyName>
+	</PropertyGroup>
 
 </Project>

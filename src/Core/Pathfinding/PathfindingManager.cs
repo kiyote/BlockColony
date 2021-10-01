@@ -9,22 +9,22 @@ using System.Diagnostics;
 
 namespace BlockColony.Core.Pathfinding {
 	internal sealed class PathfindingManager : IPathfindingManager {
-		private Thread _thread;
+		private Thread? _thread;
 		private readonly AutoResetEvent _gate;
 		private bool _terminated;
 		private readonly ConcurrentQueue<PathRequest> _requests;
 		private readonly IPathfinder _pathfinder;
 
-		private class PathRequest {
-			public IMap Map;
-			public int StartColumn;
-			public int StartRow;
-			public int GoalColumn;
-			public int GoalRow;
-			public Locomotion Locomotion;
-			public IPathfindingCallback Callback;
-			public int CallbackContext;
-		}
+		private record PathRequest(
+			IMap Map,
+			int StartColumn,
+			int StartRow,
+			int GoalColumn,
+			int GoalRow,
+			Locomotion Locomotion,
+			IPathfindingCallback Callback,
+			int CallbackContext
+		);
 
 		public PathfindingManager()
 			: this( new AStarPathfinder() ) {
@@ -41,8 +41,8 @@ namespace BlockColony.Core.Pathfinding {
 
 #if DEBUG
 		// These run on the Pathfinding thread, so use them at your own risk
-		public event EventHandler Started;
-		public event EventHandler Stopped;
+		public event EventHandler? Started;
+		public event EventHandler? Stopped;
 #endif
 
 		public bool IsRunning { get; private set; }
@@ -52,16 +52,16 @@ namespace BlockColony.Core.Pathfinding {
 				throw new InvalidOperationException( "Attempt to path with stopped pathfinding manager." );
 			}
 
-			var request = new PathRequest {
-				Map = map,
-				StartColumn = start.Column,
-				StartRow = start.Row,
-				GoalColumn = goal.Column,
-				GoalRow = goal.Row,
-				Locomotion = locomotion,
-				Callback = callback,
-				CallbackContext = callbackContext
-			};
+			var request = new PathRequest(
+				map,
+				start.Column,
+				start.Row,
+				goal.Column,
+				goal.Row,
+				locomotion,
+				callback,
+				callbackContext
+			);
 			_requests.Enqueue( request );
 			_gate.Set();
 		}
@@ -76,7 +76,9 @@ namespace BlockColony.Core.Pathfinding {
 		}
 
 		public void Stop() {
-			if( IsRunning ) {
+			if( IsRunning
+				&& _thread != default
+			) {
 				_terminated = true;
 				_gate.Set();
 				_thread.Join();
@@ -94,7 +96,7 @@ namespace BlockColony.Core.Pathfinding {
 					if( _terminated ) {
 						break;
 					}
-					if( _requests.TryDequeue( out PathRequest request ) ) {
+					if( _requests.TryDequeue( out PathRequest? request ) ) {
 #if DEBUG
 						Debug.WriteLine( "PathfindingManager::Run: Request Found" );
 #endif

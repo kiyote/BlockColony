@@ -63,16 +63,16 @@ namespace BlockColony.Core.Surface {
 			}
 
 			ref MapCell cell = ref _cells[cellIndex];
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row - 1 ), Directions.NorthWest );
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column, cell.Row - 1 ), Directions.North );
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row - 1 ), Directions.NorthEast );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row - 1 ), Directions.NorthWest );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column, cell.Row - 1 ), Directions.North );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row - 1 ), Directions.NorthEast );
 
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row ), Directions.West );
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row ), Directions.East );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row ), Directions.West );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row ), Directions.East );
 
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row + 1 ), Directions.SouthWest );
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column, cell.Row + 1 ), Directions.South );
-			method.Invoke( ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row + 1 ), Directions.SouthEast );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column - 1, cell.Row + 1 ), Directions.SouthWest );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column, cell.Row + 1 ), Directions.South );
+			method.Invoke( this, ref cell, ref GetWrappedCell( cell.Column + 1, cell.Row + 1 ), Directions.SouthEast );
 		}
 
 		public int Cost( Locomotion locomotion, int sourceIndex, int targetIndex ) {

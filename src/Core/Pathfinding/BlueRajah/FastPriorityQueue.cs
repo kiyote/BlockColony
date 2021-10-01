@@ -292,7 +292,7 @@ namespace BlockColony.Core.Pathfinding.BlueRajah {
 			T returnMe = _nodes[1];
 			//If the node is already the last node, we can remove it immediately
 			if( _numNodes == 1 ) {
-				_nodes[1] = null;
+				Array.Clear( _nodes, 1, 1 );
 				_numNodes = 0;
 				return returnMe;
 			}
@@ -301,7 +301,7 @@ namespace BlockColony.Core.Pathfinding.BlueRajah {
 			T formerLastNode = _nodes[_numNodes];
 			_nodes[1] = formerLastNode;
 			formerLastNode.QueueIndex = 1;
-			_nodes[_numNodes] = null;
+			Array.Clear( _nodes, _numNodes, 1 );
 			_numNodes--;
 
 			//Now bubble formerLastNode (which is no longer the last node) down
@@ -400,7 +400,7 @@ namespace BlockColony.Core.Pathfinding.BlueRajah {
 
 			//If the node is already the last node, we can remove it immediately
 			if( node.QueueIndex == _numNodes ) {
-				_nodes[_numNodes] = null;
+				Array.Clear( _nodes, _numNodes, 1 );
 				_numNodes--;
 				return;
 			}
@@ -409,7 +409,7 @@ namespace BlockColony.Core.Pathfinding.BlueRajah {
 			T formerLastNode = _nodes[_numNodes];
 			_nodes[node.QueueIndex] = formerLastNode;
 			formerLastNode.QueueIndex = node.QueueIndex;
-			_nodes[_numNodes] = null;
+			Array.Clear( _nodes, _numNodes, 1 );
 			_numNodes--;
 
 			//Now bubble formerLastNode (which is no longer the last node) up or down as appropriate

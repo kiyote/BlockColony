@@ -17,7 +17,7 @@ namespace BlockColony.Core.Pathfinding.AStar {
 
 		Route IPathfinder.GetPath( IMap map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			int requiredNodes = map.Columns * map.Rows;
-			if( !_pool.TryTake( out AStar impl ) ) {
+			if( !_pool.TryTake( out AStar? impl ) ) {
 				impl = new AStar( requiredNodes );
 			} else {
 				if( impl.MaximumNodes < requiredNodes ) {
@@ -35,7 +35,7 @@ namespace BlockColony.Core.Pathfinding.AStar {
 		Task<Route> IPathfinder.GetPathAsync( IMap map, int startColumn, int startRow, int goalColumn, int goalRow, Locomotion locomotion ) {
 
 			int requiredNodes = map.Columns * map.Rows;
-			if( !_pool.TryTake( out AStar impl ) ) {
+			if( !_pool.TryTake( out AStar? impl ) ) {
 				impl = new AStar( requiredNodes );
 			} else {
 				if (impl.MaximumNodes < requiredNodes) {
