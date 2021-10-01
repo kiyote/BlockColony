@@ -34,6 +34,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{59E1E8C3-CE53-4FAE-A1C1-2C7F7BF6BD5C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
@@ -52,9 +53,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pathfinding.Abstractions", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Surface.Abstractions", "src\Core\Surface.Abstractions\Surface.Abstractions.csproj", "{B28C78AE-21D0-46D0-818C-D62CFD364E4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Work.Abstractions", "src\Core\Work.Abstractions\Work.Abstractions.csproj", "{CBDBCC24-6284-4879-8A13-BB0503B187C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Work.Abstractions", "src\Core\Work.Abstractions\Work.Abstractions.csproj", "{CBDBCC24-6284-4879-8A13-BB0503B187C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mob.Abstractions", "src\Core\Mob.Abstractions\Mob.Abstractions.csproj", "{F1C059A3-C470-4872-A251-04D65FD440CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mob.Abstractions", "src\Core\Mob.Abstractions\Mob.Abstractions.csproj", "{F1C059A3-C470-4872-A251-04D65FD440CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{B38DCAF8-2934-45E1-84A5-0340FD612981}"
 EndProject

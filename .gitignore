@@ -62,6 +62,9 @@ artifacts/
 # StyleCop
 StyleCopReport.xml
 
+# Test Results
+**/TestResults/*.xml
+
 # Files built by Visual Studio
 *_i.c
 *_p.c
