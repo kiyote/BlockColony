@@ -1,4 +1,3 @@
-using System;
 using BlockColony.Core.Surface;
 using NUnit.Framework;
 

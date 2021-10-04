@@ -1,38 +1,40 @@
-using System;
-using System.Diagnostics;
-using BlockColony.Core.Surface;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using BlockColony.Core.Pathfinding.AStar;
+using BlockColony.Core.Surface;
 
 namespace BlockColony.Core.Pathfinding.Profiler.Tests {
-	internal class Program {
-		private static void Main( string[] _ ) {
-			ProfileAStar();
-
-			Console.ReadKey();
+	public class Program {
+		public static void Main( string[] _ ) {
+			BenchmarkDotNet.Reports.Summary summary = BenchmarkRunner.Run<Pathfinding>();
 		}
 
-		private static void ProfileAStar() {
-			const int iterations = 10;
-			const int size = 400;
+		[MemoryDiagnoser]
+		public class Pathfinding {
 
-			IMap map = new Map( size, size, new DefaultInitializer() );
+			private readonly IMap _map;
+			private readonly IPathfinder _astarPathfinder;
 
-			ref MapCell start = ref map.GetCell( (int)( (float)map.Columns * 0.25f ), (int)( (float)map.Rows * 0.25f ) );
-			ref MapCell goal = ref map.GetCell( map.Columns - (int)( (float)map.Columns * 0.25f ), map.Rows - (int)( (float)map.Rows * 0.25f ) );
-			IPathfinder pathfinder = new AStarPathfinder();
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
-			for( int i = 0; i < iterations; i++ ) {
-				_ = pathfinder.GetPath( map, ref start, ref goal, Locomotion.Walk );
+			public Pathfinding() {
+				const int size = 400;
+
+				_map = new Map( size, size, new DefaultInitializer() );
+				_astarPathfinder = new AStarPathfinder();
 			}
-			stopwatch.Stop();
-			Console.WriteLine( $"A* {map.Columns}x{map.Rows}: {(float)stopwatch.ElapsedMilliseconds / (float)iterations}ms" );
-		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Directions.All;
+			[Benchmark]
+			public void ProfileAStar() {
+
+				ref MapCell start = ref _map.GetCell( (int)( (float)_map.Columns * 0.25f ), (int)( (float)_map.Rows * 0.25f ) );
+				ref MapCell goal = ref _map.GetCell( _map.Columns - (int)( (float)_map.Columns * 0.25f ), _map.Rows - (int)( (float)_map.Rows * 0.25f ) );
+				_astarPathfinder.GetPath( _map, ref start, ref goal, Locomotion.Walk );
+			}
+
+			private class DefaultInitializer : IMapMethod {
+				void IMapMethod.Invoke( ref MapCell cell ) {
+					cell.TerrainCost = 100;
+					cell.Walkability = (byte)Directions.All;
+				}
 			}
 		}
 

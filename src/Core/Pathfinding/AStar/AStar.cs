@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using BlockColony.Core.Surface;
 using BlockColony.Core.Pathfinding.BlueRajah;
+using Microsoft.Extensions.ObjectPool;
 
 namespace BlockColony.Core.Pathfinding.AStar {
 	internal class AStar : IMapNeighbourMethod {
 
+		private readonly Queue<AStarPriorityQueueNode> _pool;
 		private static readonly Route Empty = new Route();
 		private readonly Dictionary<int, int> _costSoFar;
 		private readonly Dictionary<int, int> _cameFrom;
@@ -26,6 +28,7 @@ namespace BlockColony.Core.Pathfinding.AStar {
 			// That will be worth looking at if you run into performance issues.
 			_cameFrom = new Dictionary<int, int>();
 			_costSoFar = new Dictionary<int, int>();
+			_pool = new Queue<AStarPriorityQueueNode>();
 		}
 
 		public int MaximumNodes { get; }
@@ -52,9 +55,14 @@ namespace BlockColony.Core.Pathfinding.AStar {
 			// Conduct the A* search
 		public Route GetPath( IMap map, ref MapCell start, ref MapCell goal, Locomotion locomotion ) {
 			_locomotion = locomotion;
-			var startNode = new AStarPriorityQueueNode {
-				CellIndex = start.Index
-			};
+			if (!_pool.TryDequeue( out AStarPriorityQueueNode? startNode ) ) {
+				startNode = new AStarPriorityQueueNode {
+					CellIndex = start.Index
+				};
+			} else {
+				startNode!.CellIndex = start.Index;
+			}
+
 			// Add the starting location to the frontier with a priority of 0
 			_frontier.Enqueue( startNode, 0 );
 
@@ -76,6 +84,8 @@ namespace BlockColony.Core.Pathfinding.AStar {
 				_currentIndex = current.CellIndex;
 				_goalIndex = goal.Index;
 				map.ForEachNeighbour( current.CellIndex, this );
+
+				_pool.Enqueue( current );
 			}
 
 
@@ -126,9 +136,13 @@ namespace BlockColony.Core.Pathfinding.AStar {
 				_cameFrom.Add( neighbour.Index, _currentIndex );
 				ref MapCell goal = ref map.GetCell( _goalIndex );
 				int priority = newCost + Heuristic( map, ref neighbour, ref goal );
-				var neighbourNode = new AStarPriorityQueueNode {
-					CellIndex = neighbour.Index
-				};
+				if( !_pool.TryDequeue( out AStarPriorityQueueNode? neighbourNode ) ) {
+					neighbourNode = new AStarPriorityQueueNode {
+						CellIndex = neighbour.Index
+					};
+				} else {
+					neighbourNode!.CellIndex = neighbour.Index;
+				}
 				_frontier.Enqueue( neighbourNode, priority );
 			}
 		}

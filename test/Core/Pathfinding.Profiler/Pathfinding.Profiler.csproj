@@ -3,13 +3,19 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>BlockColony.Core.Pathfinding.Profiler</RootNamespace>
-		<AssemblyName>Core.Pathfinding.Profiler</AssemblyName>
+		<AssemblyName>Pathfinding.Profiler</AssemblyName>
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="$(SolutionDir)src\Core\Pathfinding\Pathfinding.csproj" />
 		<ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
+		<ProjectReference Include="..\..\..\src\Core\Pathfinding.Abstractions\Pathfinding.Abstractions.csproj" />
+		<ProjectReference Include="..\..\..\src\Core\Surface.Abstractions\Surface.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>
