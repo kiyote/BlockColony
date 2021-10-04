@@ -1,5 +1,10 @@
-﻿namespace BlockColony.Core.Surface {
+﻿using System;
+
+namespace BlockColony.Core.Surface {
+
+	public delegate void MapCellInitializer( ref MapCell cell );
+
 	public interface IMapFactory {
-		IMap Create( int columns, int rows, IMapMethod initializer );
+		IMap Create( int columns, int rows, MapCellInitializer initializer );
 	}
 }

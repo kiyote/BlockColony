@@ -1,84 +1,78 @@
-using System;
-using System.Threading;
-using BlockColony.Core.Surface;
 using BlockColony.Core.Shared;
+using BlockColony.Core.Surface;
+using BlockColony.Default.MapGenerator;
 
 namespace BlockColony.Core.MapGenerator {
-	internal sealed class Generator : IMapGenerator {
+	internal sealed class MountainsideTerrainGenerator : IMapTerrainGenerator {
 		private readonly ITerrainManager _terrainManager;
 		private readonly IRandom _random;
-		private readonly IMapFactory _mapFactory;
+		private readonly MapGeneratorOptions _mapOptions;
+		private readonly MountainsideTerrainGeneratorOptions _terrainOptions;
 
-		public Generator(
-			IMapFactory mapFactory,
+		public MountainsideTerrainGenerator(
 			IRandom random,
-			ITerrainManager terrainManager
+			ITerrainManager terrainManager,
+			MapGeneratorOptions options,
+			MountainsideTerrainGeneratorOptions terrainOptions
 		) {
-			_mapFactory = mapFactory;
 			_random = random;
 			_terrainManager = terrainManager;
+			_mapOptions = options;
+			_terrainOptions = terrainOptions;
 		}
 
-		void IMapGenerator.Build(
-			MapGeneratorOptions options,
-			Action<IMap> handler
+		void IMapTerrainGenerator.Initialize(
+			ref MapCell cell
 		) {
-			Thread thread = new Thread( () => Run(options, handler) ) {
-				Name = "Map Generator Thread"
-			};
-			thread.Start();
-			// Thread will terminate when the Run completes which is the
-			// completion of the map generation and the population of _map.
+			cell.NewTemperature = (byte)_terrainOptions.AmbientTemperature;
+
+			ITerrain terrain = _terrainManager[3];  // Magically know this is soil!
+			cell.NewTerrainId = 0;
+			cell.NewMoisture = 0;
+			cell.TerrainCost = (short)terrain[_terrainOptions.AmbientTemperature].PathingCost;
 		}
 
-		private void Run(
-			MapGeneratorOptions options,
-			Action<IMap> mapCompleted
+		void IMapTerrainGenerator.Build(
+			IMap map
 		) {
-			IMap map = _mapFactory.Create(
-				options.Columns,
-				options.Rows,
-				new CellInitializer(
-					_terrainManager,
-					options )
-			);
-
 			int layerWidth = map.Columns / 4;
 			// Applying layers from far-right to far-left order, otherwise
 			// the function wouldn't know when to stop applying its terrain
-			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Far, layerWidth * 3, map.Columns );
-			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Middle, layerWidth * 2, map.Columns );
-			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Entry, layerWidth * 1, map.Columns );
-			ApplyTerrainLayer( _terrainManager, map, options.Terrain.Outside, 0, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, _terrainOptions.Terrain.Far, layerWidth * 3, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, _terrainOptions.Terrain.Middle, layerWidth * 2, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, _terrainOptions.Terrain.Entry, layerWidth * 1, map.Columns );
+			ApplyTerrainLayer( _terrainManager, map, _terrainOptions.Terrain.Outside, 0, map.Columns );
 
 			// Otherwise the left-edge of the map will be jagged
-			FillOutsideEdge( _terrainManager, map, options.Terrain.Outside );
+			FillOutsideEdge( _terrainManager, map, _terrainOptions.Terrain.Outside );
 
-			ApplyEasyRiver( _terrainManager, map, options.Terrain.River );
-
-			mapCompleted( map );
+			ApplyEasyRiver( _terrainManager, map, _terrainOptions.Terrain.River );
 		}
+
 
 		private class CellInitializer : IMapMethod {
 
 			private readonly ITerrainManager _terrainManager;
-			private readonly MapGeneratorOptions _options;
+			private readonly MapGeneratorOptions _mapOptions;
+			private readonly MountainsideTerrainGeneratorOptions _terrainOptions;
 
 			public CellInitializer(
 				ITerrainManager terrainManager,
-				MapGeneratorOptions options
+				MapGeneratorOptions mapOptions,
+				MountainsideTerrainGeneratorOptions terrainOptions
 			) {
 				_terrainManager = terrainManager;
-				_options = options;
+				_mapOptions = mapOptions;
+				_terrainOptions = terrainOptions;
 			}
 
 			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.NewTemperature = (byte)_options.AmbientTemperature;
+				cell.NewTemperature = (byte)_terrainOptions.AmbientTemperature;
 
-				ITerrain terrain = _terrainManager[ 3 ];  // Magically know this is soil!
+				ITerrain terrain = _terrainManager[3];  // Magically know this is soil!
 				cell.NewTerrainId = 0;
 				cell.NewMoisture = 0;
-				cell.TerrainCost = (short)terrain[ _options.AmbientTemperature ].PathingCost;
+				cell.TerrainCost = (short)terrain[_terrainOptions.AmbientTemperature].PathingCost;
 			}
 		}
 

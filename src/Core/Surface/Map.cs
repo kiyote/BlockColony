@@ -7,8 +7,8 @@ namespace BlockColony.Core.Surface {
 		private readonly MapCell[] _cells;
 		private readonly int _rowSize;
 
-		public Map( int columns, int rows, IMapMethod initializer ) {
-			if( initializer == default( IMapMethod ) ) {
+		public Map( int columns, int rows, MapCellInitializer initializer ) {
+			if( initializer == default ) {
 				throw new ArgumentNullException( nameof( initializer ) );
 			}
 
@@ -36,7 +36,7 @@ namespace BlockColony.Core.Surface {
 					cell.Row = (short)row;
 					cell.Index = index;
 
-					initializer.Invoke( ref cell );
+					initializer( ref cell );
 				}
 			}
 		}

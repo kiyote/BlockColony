@@ -45,10 +45,13 @@ dotnet_style_prefer_auto_properties                                      = true 
 dotnet_style_prefer_is_null_check_over_reference_equality_method         = true : suggestion
 dotnet_style_prefer_conditional_expression_over_assignment               = true : none
 dotnet_style_prefer_conditional_expression_over_return                   = true : none
+csharp_style_implicit_object_creation_when_type_is_apparent              = false : none
+csharp_style_deconstructed_variable_declaration                          = false : none
 
 dotnet_style_coalesce_expression                                         = true : suggestion
 dotnet_style_null_propagation                                            = true : suggestion
 
+dotnet_diagnostic.IDE0042.severity                                       = none
 dotnet_diagnostic.IDE0090.severity                                       = none
 dotnet_diagnostic.IDE1006.severity                                       = none
 

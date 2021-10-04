@@ -6,6 +6,8 @@ namespace BlockColony.Core.MapGenerator {
 
 		void Build(
 			MapGeneratorOptions options,
+			IMapTerrainGenerator terrainGenerator,
+			Action<string> generationUpdated,
 			Action<IMap> mapCompleted
 		);
 	}

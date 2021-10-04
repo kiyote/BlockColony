@@ -8,30 +8,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="generator.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="terrain.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="coverlet.collector" Version="3.1.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+		<PackageReference Include="Moq" Version="4.16.1" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0008" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="$(SolutionDir)src\Core\MapGenerator.Abstractions\MapGenerator.Abstractions.csproj" />
 		<ProjectReference Include="$(SolutionDir)src\Core\MapGenerator\MapGenerator.csproj" />
-		<ProjectReference Include="$(SolutionDir)src\Core\Shared\Shared.csproj" />
-		<ProjectReference Include="$(SolutionDir)src\Core\Surface\Surface.csproj" />
+		<ProjectReference Include="$(SolutionDir)src\Core\Surface.Abstractions\Surface.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -18,7 +18,7 @@ namespace BlockColony.Core.Pathfinding.Profiler.Tests {
 			public Pathfinding() {
 				const int size = 400;
 
-				_map = new Map( size, size, new DefaultInitializer() );
+				_map = new Map( size, size, DefaultInitializer );
 				_astarPathfinder = new AStarPathfinder();
 			}
 
@@ -30,11 +30,9 @@ namespace BlockColony.Core.Pathfinding.Profiler.Tests {
 				_astarPathfinder.GetPath( _map, ref start, ref goal, Locomotion.Walk );
 			}
 
-			private class DefaultInitializer : IMapMethod {
-				void IMapMethod.Invoke( ref MapCell cell ) {
-					cell.TerrainCost = 100;
-					cell.Walkability = (byte)Directions.All;
-				}
+			private void DefaultInitializer( ref MapCell cell ) {
+				cell.TerrainCost = 100;
+				cell.Walkability = (byte)Directions.All;
 			}
 		}
 

@@ -11,13 +11,4 @@
 		<ProjectReference Include="..\Surface.Abstractions\Surface.Abstractions.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="Assets\generator.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Assets\terrain.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
 </Project>

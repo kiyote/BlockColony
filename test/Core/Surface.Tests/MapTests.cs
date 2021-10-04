@@ -10,7 +10,7 @@ namespace BlockColony.Core.Surface.Tests {
 		public void TestInitialize() {
 			const int Rows = 3;
 			const int Columns = 3;
-			_map = new Map( Columns, Rows, new DefaultInitializer() );
+			_map = new Map( Columns, Rows, DefaultInitializer );
 		}
 
 		[TestCase( 1, 0, Directions.North, 1, 2 )]
@@ -38,11 +38,9 @@ namespace BlockColony.Core.Surface.Tests {
 			Assert.AreEqual( expectedRow, actual.Row );
 		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Directions.All;
-			}
+		private void DefaultInitializer( ref MapCell cell ) {
+			cell.TerrainCost = 100;
+			cell.Walkability = (byte)Directions.All;
 		}
 	}
 }

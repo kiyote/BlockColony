@@ -8,7 +8,6 @@ namespace BlockColony.Core.Pathfinding.Tests {
 	public class PathfindingManagerTests {
 		private const int DELAY_MS = 500;
 		private IMap _map;
-		private DefaultInitializer _defaultInitializer;
 		private AutoResetEvent _gate;
 		private PathfindingCallback _callback;
 		private IPathfindingManager _manager;
@@ -17,8 +16,7 @@ namespace BlockColony.Core.Pathfinding.Tests {
 		public void OneTimeSetUp() {
 			IMapFactory factory = new MapFactory();
 
-			_defaultInitializer = new DefaultInitializer();
-			_map = factory.Create( 10, 10, _defaultInitializer );
+			_map = factory.Create( 10, 10, DefaultInitializer );
 		}
 
 		[SetUp]
@@ -145,11 +143,9 @@ namespace BlockColony.Core.Pathfinding.Tests {
 			}
 		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Directions.All;
-			}
+		private void DefaultInitializer( ref MapCell cell ) {
+			cell.TerrainCost = 100;
+			cell.Walkability = (byte)Directions.All;
 		}
 
 		private class PathfindingCallback : IPathfindingCallback {

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+
+		<IsPackable>false</IsPackable>
+
+		<RootNamespace>BlockColony.Default.MapGenerator.Tests</RootNamespace>
+
+		<AssemblyName>Default.MapGenerator.Tests</AssemblyName>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="generator.json" />
+		<None Remove="terrain.json" />
+		<None Remove="terraingenerator.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="generator.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="terrain.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="terraingenerator.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+		<PackageReference Include="NUnit" Version="3.13.1" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+		<PackageReference Include="coverlet.collector" Version="3.0.2" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\src\Core\MapGenerator.Abstractions\MapGenerator.Abstractions.csproj" />
+		<ProjectReference Include="..\..\..\src\Core\Shared.Abstractions\Shared.Abstractions.csproj" />
+		<ProjectReference Include="..\..\..\src\Core\Shared\Shared.csproj" />
+		<ProjectReference Include="..\..\..\src\Core\Surface.Abstractions\Surface.Abstractions.csproj" />
+		<ProjectReference Include="..\..\..\src\Core\Surface\Surface.csproj" />
+		<ProjectReference Include="..\..\..\src\Default\MapGenerator\MapGenerator.csproj" />
+	</ItemGroup>
+
+</Project>

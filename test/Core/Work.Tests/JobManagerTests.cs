@@ -17,7 +17,7 @@ namespace BlockColony.Core.Work.Tests {
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
-			_map = new Map( 10, 10, new DefaultInitializer() );
+			_map = new Map( 10, 10, DefaultInitializer );
 			_pathfindingManager = new PathfindingManager();
 			_pathfindingManager.Start();
 		}
@@ -189,11 +189,9 @@ namespace BlockColony.Core.Work.Tests {
 			return _fits;
 		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Directions.All;
-			}
+		private void DefaultInitializer( ref MapCell cell ) {
+			cell.TerrainCost = 100;
+			cell.Walkability = (byte)Directions.All;
 		}
 
 		IMap IMapProvider.Current() {

@@ -1,6 +1,4 @@
 ﻿{
-  "columns": 100,
-  "rows": 100,
   "ambientTemperature": 21,
   "terrain": {
     "outside": {

@@ -20,7 +20,7 @@ namespace BlockColony.Core.Mob.Tests {
 		public void OneTimeSetUp() {
 			const int Rows = 3;
 			const int Columns = 3;
-			_map = new Map( Columns, Rows, new DefaultInitializer() );
+			_map = new Map( Columns, Rows, DefaultInitializer );
 		}
 
 		[OneTimeTearDown]
@@ -110,11 +110,9 @@ namespace BlockColony.Core.Mob.Tests {
 			Assert.AreEqual( Errand.Idle, _actor.Errand );
 		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Directions.All;
-			}
+		private void DefaultInitializer( ref MapCell cell ) {
+			cell.TerrainCost = 100;
+			cell.Walkability = (byte)Directions.All;
 		}
 
 		IMap IMapProvider.Current() {

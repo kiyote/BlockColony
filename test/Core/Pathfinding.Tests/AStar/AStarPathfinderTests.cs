@@ -6,12 +6,10 @@ namespace BlockColony.Core.Pathfinding.AStar.Tests {
 	public class AStarPathfinderTests {
 
 		private IPathfinder _pathfinder;
-		private DefaultInitializer _defaultInitializer;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp() {
 			_pathfinder = new AStarPathfinder();
-			_defaultInitializer = new DefaultInitializer();
 		}
 
 		[TestCase( 1, 1, 8, 8, Locomotion.Fly )]
@@ -29,7 +27,7 @@ namespace BlockColony.Core.Pathfinding.AStar.Tests {
 			int goalRow,
 			Locomotion locomotion
 		) {
-			IMap map = new Map( 10, 10, _defaultInitializer );
+			IMap map = new Map( 10, 10, DefaultInitializer );
 			ref MapCell start = ref map.GetCell( startColumn, startRow );
 			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
 			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
@@ -53,7 +51,7 @@ namespace BlockColony.Core.Pathfinding.AStar.Tests {
 			int goalRow,
 			Locomotion locomotion
 		) {
-			IMap map = new Map( 10, 10, _defaultInitializer );
+			IMap map = new Map( 10, 10, DefaultInitializer );
 
 			for( int column = 0; column < 10; column++ ) {
 				map.GetCell( column, 0 ).TerrainCost = 32000;
@@ -87,7 +85,7 @@ namespace BlockColony.Core.Pathfinding.AStar.Tests {
 			int goalRow,
 			Locomotion locomotion
 		) {
-			IMap map = new Map( 10, 10, _defaultInitializer );
+			IMap map = new Map( 10, 10, DefaultInitializer );
 			ref MapCell start = ref map.GetCell( startColumn, startRow );
 			ref MapCell goal = ref map.GetCell( goalColumn, goalRow );
 			Route path = _pathfinder.GetPath( map, ref start, ref goal, locomotion );
@@ -96,11 +94,9 @@ namespace BlockColony.Core.Pathfinding.AStar.Tests {
 			Assert.AreEqual( 4, path.Count );
 		}
 
-		private class DefaultInitializer : IMapMethod {
-			void IMapMethod.Invoke( ref MapCell cell ) {
-				cell.TerrainCost = 100;
-				cell.Walkability = (byte)Directions.All;
-			}
+		private void DefaultInitializer( ref MapCell cell ) {
+			cell.TerrainCost = 100;
+			cell.Walkability = (byte)Directions.All;
 		}
 	}
 }
